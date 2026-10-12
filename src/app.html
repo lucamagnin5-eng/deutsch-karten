@@ -57,6 +57,11 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .gram{display:flex;flex-direction:column;gap:2px;font-size:.95rem;color:var(--ink)}
 .gram span b{font-weight:400;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
 .hint{color:var(--muted);font-size:.9rem}
+.ex{margin-top:6px;border-left:3px solid var(--line);padding-left:10px;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.ex p{margin:0;line-height:1.4;overflow-wrap:anywhere}
+.ex .exde{font-style:italic;font-size:1rem}
+.ex .exfr{color:var(--muted);font-size:.88rem}
+.exspeak{border:0;background:none;color:var(--accent);font-size:.82rem;padding:2px 0;text-decoration:underline}
 .speak{border:1px solid var(--line);background:var(--bg);border-radius:50%;width:44px;height:44px;display:grid;place-items:center;flex:none;padding:0}
 .card .speak{position:absolute;right:14px;bottom:14px}
 .speak svg{width:20px;height:20px;fill:currentColor}
@@ -79,6 +84,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .words .fr{font-size:.95rem}
 .words .de{font-family:var(--display);font-weight:600;color:var(--accent);font-size:1.08rem}
 .words .g{font-size:.85rem;color:var(--muted)}
+.words .exl{font-size:.85rem;font-style:italic}
+.words .exlf{font-size:.8rem;color:var(--muted)}
 .words .txt span{align-self:flex-start;max-width:100%}
 .words .masked{background:var(--line);color:transparent;border-radius:6px;cursor:pointer;user-select:none}
 .words .speak{width:38px;height:38px}
@@ -128,6 +135,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
           <div class="ans" id="ans" hidden>
             <div class="a" id="a"></div>
             <div class="gram" id="gram"></div>
+            <div class="ex" id="ex"><p class="exde" lang="de" id="exDe"></p><p class="exfr" id="exFr"></p><button class="exspeak" id="exSpeak">Écouter l'exemple</button></div>
           </div>
           <div class="hint" id="hint"></div>
         </div>
@@ -168,10 +176,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
         <label class="field" for="inPl">Pluriel (noms)<input id="inPl" autocomplete="off" lang="de" autocapitalize="off" placeholder="die Koffer"></label>
         <label class="field" for="inPp">Participe passé (verbes)<input id="inPp" autocomplete="off" lang="de" autocapitalize="off" placeholder="hat gemacht"></label>
       </div>
+      <label class="field" for="inEx">Exemple en allemand (facultatif)<input id="inEx" autocomplete="off" lang="de" placeholder="Mein Koffer ist zu schwer."></label>
+      <label class="field" for="inExFr">Traduction de l'exemple<input id="inExFr" autocomplete="off" placeholder="Ma valise est trop lourde."></label>
       <button class="btn" type="submit">Ajouter la carte</button>
     </form>
     <div class="msg" id="msg" aria-live="polite"></div>
-    <p>Importer un CSV : colonne 1 = français, 2 = allemand, 3 = tags (séparés par des virgules ou des |), 4 = pluriel, 5 = participe passé. Les colonnes 3 à 5 sont facultatives.</p>
+    <p>Importer un CSV : colonne 1 = français, 2 = allemand, 3 = tags (séparés par des virgules ou des |), 4 = pluriel, 5 = participe passé, 6 = exemple en allemand, 7 = traduction. Les colonnes 3 à 7 sont facultatives.</p>
     <label class="btn ghost" for="csv" style="text-align:center">Importer un CSV<input type="file" id="csv" accept=".csv,.txt,.tsv,text/csv,text/plain" hidden></label>
     <ul class="mine" id="mine"></ul>
   </section>
@@ -180,8 +190,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 </div>
 
 <script>
-const BASE = __CARDS__.map(c=>({id:c[0]+"|"+c[1],fr:c[0],de:c[1],tags:c[2],pl:c[3],pp:c[4]}));
-const TAG_ORDER=["Phrase","Nom","Verbe","Adjectif","Mot outil","Travail","Réunion","E-mail","Téléphone","Bases","Conversation","Comprendre","Questions","Voyage","Restaurant","Achats","Santé","Temps"];
+const BASE = __CARDS__.map(c=>({id:c[0]+"|"+c[1],fr:c[0],de:c[1],tags:c[2],pl:c[3],pp:c[4],ex:c[5],exfr:c[6]}));
+const TAG_ORDER=["Phrase","Nom","Verbe","Adjectif","Mot outil","Connecteur","Préposition","Travail","Réunion","E-mail","Téléphone","Bases","Conversation","Comprendre","Questions","Voyage","Restaurant","Achats","Santé","Corps","Temps","Météo","Famille","Logement","Nourriture","Vêtements","Loisirs","Sentiments"];
 const DAY=86400000, INTERVALS=[0,1,3,7,16,35];
 const KEY="deutsch-karten-v1";
 const SPEAKER='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
@@ -255,6 +265,7 @@ function renderCard(){
   $("a").textContent=S.dir==="fr"?cur.de:cur.fr;
   $("a").lang=S.dir==="fr"?"de":"fr";
   $("gram").innerHTML=gramHTML(cur);
+  $("ex").hidden=!cur.ex; $("exDe").textContent=cur.ex||""; $("exFr").textContent=cur.exfr||"";
   $("ans").hidden=true; $("hint").hidden=false;
   const isNoun=cur.tags.includes("Nom"), isVerb=cur.tags.includes("Verbe");
   $("hint").textContent=S.dir==="fr"
@@ -273,7 +284,8 @@ function renderList(P){
     const m=S.mask?" masked":"";
     const fr=`<span class="fr${!hideDe?m:""}">${esc(c.fr)}</span>`;
     const de=`<span class="de${hideDe?m:""}" lang="de">${esc(c.de)}</span>`+(g?`<span class="g${hideDe?m:""}" lang="de">${g}</span>`:"");
-    return `<li><div class="txt">${hideDe?fr+de:de+fr}</div><button class="speak" data-i="${i}" aria-label="Écouter">${SPEAKER}</button></li>`;
+    const ex=c.ex?`<span class="exl${hideDe?m:""}" lang="de">${esc(c.ex)}</span>`+(c.exfr?`<span class="exlf${!hideDe?m:""}">${esc(c.exfr)}</span>`:""):"";
+    return `<li><div class="txt">${(hideDe?fr+de:de+fr)+ex}</div><button class="speak" data-i="${i}" aria-label="Écouter">${SPEAKER}</button></li>`;
   }).join("");
   $("words").onclick=e=>{
     const sp=e.target.closest(".speak"); if(sp){speak(P[+sp.dataset.i]);return}
@@ -299,13 +311,17 @@ function speak(c){
   let txt=c.de.split(" / ")[0].replace(/\(.*?\)/g,"").replace(/\.\.\./g,"");
   if(c.pl&&!c.pl.startsWith("(")) txt+=". "+c.pl.split(" / ")[0];
   if(c.pp) txt+=". "+c.pp.split(" / ")[0];
+  say(txt);
+}
+function say(txt){
+  if(!txt||!("speechSynthesis" in window))return;
   speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang="de-DE"; u.rate=.9; if(voice)u.voice=voice; speechSynthesis.speak(u);
 }
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
 
 function splitTags(s){return [...new Set(String(s||"").split(/[,|;\/]/).map(t=>t.trim()).filter(Boolean).map(t=>t[0].toUpperCase()+t.slice(1)))]}
 function rebuild(){
-  CARDS=S.custom.map(c=>({id:"m|"+c.fr+"|"+c.de,fr:c.fr,de:c.de,tags:c.tags.length?c.tags:["Mes cartes"],pl:c.pl||"",pp:c.pp||""})).concat(BASE);
+  CARDS=S.custom.map(c=>({id:"m|"+c.fr+"|"+c.de,fr:c.fr,de:c.de,tags:c.tags.length?c.tags:["Mes cartes"],pl:c.pl||"",pp:c.pp||"",ex:c.ex||"",exfr:c.exfr||""})).concat(BASE);
   const count={}; CARDS.forEach(c=>c.tags.forEach(t=>count[t]=(count[t]||0)+1));
   const tags=Object.keys(count).sort((a,b)=>{const ia=TAG_ORDER.indexOf(a),ib=TAG_ORDER.indexOf(b);return (ia<0?-1:ia)-(ib<0?-1:ib)||a.localeCompare(b,"fr")});
   if(S.tag!=="Tout"&&!count[S.tag]) S.tag="Tout";
@@ -317,7 +333,7 @@ function rebuild(){
 function addCards(list){
   const have=new Set(CARDS.map(c=>c.fr+"|"+c.de)); let n=0;
   list.forEach(c=>{const fr=(c.fr||"").trim(),de=(c.de||"").trim();if(!fr||!de||have.has(fr+"|"+de))return;have.add(fr+"|"+de);
-    S.custom.unshift({fr,de,tags:splitTags(c.tags),pl:(c.pl||"").trim(),pp:(c.pp||"").trim()});n++});
+    S.custom.unshift({fr,de,tags:splitTags(c.tags),pl:(c.pl||"").trim(),pp:(c.pp||"").trim(),ex:(c.ex||"").trim(),exfr:(c.exfr||"").trim()});n++});
   save();rebuild();render();return n;
 }
 function parseCSV(text){
@@ -334,7 +350,7 @@ function parseCSV(text){
   if(f||row.length){row.push(f);rows.push(row)}
   let r=rows.filter(x=>x.length>=2&&x[0].trim()&&x[1].trim());
   if(r.length&&/^(fr|français|francais|recto|front)$/i.test(r[0][0].trim()))r=r.slice(1);
-  return r.map(x=>({fr:x[0],de:x[1],tags:x[2],pl:x[3],pp:x[4]}));
+  return r.map(x=>({fr:x[0],de:x[1],tags:x[2],pl:x[3],pp:x[4],ex:x[5],exfr:x[6]}));
 }
 
 rebuild();
@@ -348,11 +364,12 @@ $("cramBtn").onclick=startCram; $("doneCram").onclick=startCram; $("listCram").o
 $("cramStop").onclick=()=>{cram=null;render()};
 $("show").onclick=reveal; $("card").onclick=e=>{if(!e.target.closest(".speak"))reveal()};
 $("speak").onclick=()=>speak(cur);
+$("exSpeak").onclick=e=>{e.stopPropagation();if(cur)say(cur.ex)};
 $("g0").onclick=()=>grade(0);$("g1").onclick=()=>grade(1);$("g2").onclick=()=>grade(2);
 $("reset").onclick=()=>{$("confirm").hidden=false};
 $("yes").onclick=()=>{S.p={};save();$("confirm").hidden=true;render()};
 $("toggle").onclick=()=>{$("panel").hidden=!$("panel").hidden;if(!$("panel").hidden)$("panel").scrollIntoView({behavior:"smooth"})};
-$("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").value,de:$("inDe").value,tags:$("inTags").value,pl:$("inPl").value,pp:$("inPp").value}]);$("msg").textContent=n?"Carte ajoutée.":"Cette carte existe déjà.";["inFr","inDe","inPl","inPp"].forEach(id=>$(id).value="");$("inFr").focus()};
+$("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").value,de:$("inDe").value,tags:$("inTags").value,pl:$("inPl").value,pp:$("inPp").value,ex:$("inEx").value,exfr:$("inExFr").value}]);$("msg").textContent=n?"Carte ajoutée.":"Cette carte existe déjà.";["inFr","inDe","inPl","inPp","inEx","inExFr"].forEach(id=>$(id).value="");$("inFr").focus()};
 $("csv").onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const n=addCards(parseCSV(String(rd.result)));$("msg").textContent=n+" carte"+(n>1?"s":"")+" importée"+(n>1?"s":"")+".";e.target.value=""};rd.readAsText(file,"utf-8")};
 document.addEventListener("keydown",e=>{if(e.target.closest("input,form")||S.view!=="cards")return;if(e.key===" "){e.preventDefault();reveal()}else if(["1","2","3"].includes(e.key))grade(+e.key-1)});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
