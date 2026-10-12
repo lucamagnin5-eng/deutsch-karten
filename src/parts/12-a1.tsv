@@ -1,0 +1,250 @@
+zéro, un, deux, trois	null, eins, zwei, drei	Nombres, Mot outil			Meine Telefonnummer beginnt mit null, drei, zwei.	Mon numéro de téléphone commence par zéro, trois, deux.	A1
+quatre, cinq, six	vier, fünf, sechs	Nombres, Mot outil			Wir sind vier Personen und brauchen sechs Teller.	Nous sommes quatre et nous avons besoin de six assiettes.	A1
+sept, huit, neuf, dix	sieben, acht, neun, zehn	Nombres, Mot outil			Der Kurs beginnt um acht und endet um zehn.	Le cours commence à huit heures et finit à dix heures.	A1
+onze, douze	elf, zwölf	Nombres, Mot outil			Mein Sohn ist elf, meine Tochter ist zwölf.	Mon fils a onze ans, ma fille en a douze.	A1
+treize à dix-neuf	dreizehn, vierzehn, fünfzehn, sechzehn, siebzehn, achtzehn, neunzehn	Nombres, Mot outil			Der Bus fährt alle fünfzehn Minuten.	Le bus passe toutes les quinze minutes.	A1
+vingt	zwanzig	Nombres, Mot outil			Das Ticket kostet zwanzig Euro.	Le billet coûte vingt euros.	A1
+vingt et un, vingt-deux…	einundzwanzig, zweiundzwanzig …	Nombres, Mot outil			Ich wohne in der Goethestraße zweiundzwanzig.	J'habite au 22, rue Goethe.	A1
+trente, quarante, cinquante	dreißig, vierzig, fünfzig	Nombres, Mot outil			Mein Chef ist fünfzig, ich bin dreißig.	Mon chef a cinquante ans, j'en ai trente.	A1
+soixante, soixante-dix, quatre-vingts, quatre-vingt-dix	sechzig, siebzig, achtzig, neunzig	Nombres, Mot outil			Meine Oma ist schon neunzig Jahre alt.	Ma grand-mère a déjà quatre-vingt-dix ans.	A1
+cent	hundert / einhundert	Nombres, Mot outil			Die Jacke kostet hundert Euro.	La veste coûte cent euros.	A1
+mille	tausend / eintausend	Nombres, Mot outil			Die Reise kostet ungefähr tausend Euro.	Le voyage coûte environ mille euros.	A1
+le nombre, le chiffre	die Zahl	Nombres, Nom	die Zahlen		Schreiben Sie die Zahl bitte in Buchstaben.	Écrivez le nombre en lettres, s'il vous plaît.	A1
+premier, deuxième, troisième	erste, zweite, dritte	Nombres, Adjectif			Ich wohne im dritten Stock.	J'habite au troisième étage.	A1
+quatrième, cinquième, septième, vingtième	vierte, fünfte, siebte, zwanzigste	Nombres, Adjectif			Heute ist der vierte Mai.	Aujourd'hui, nous sommes le quatre mai.	A1
+une fois, deux fois, trois fois	einmal, zweimal, dreimal	Nombres, Temps, Mot outil			Ich gehe zweimal pro Woche schwimmen.	Je vais nager deux fois par semaine.	A1
+la couleur	die Farbe	Couleurs, Nom	die Farben		Welche Farbe hat dein neues Auto?	De quelle couleur est ta nouvelle voiture ?	A1
+rouge	rot	Couleurs, Adjectif			Die Ampel ist rot, wir müssen warten.	Le feu est rouge, nous devons attendre.	A1
+bleu	blau	Couleurs, Adjectif			Heute ist der Himmel ganz blau.	Aujourd'hui, le ciel est tout bleu.	A1
+vert	grün	Couleurs, Adjectif			Im Frühling ist der Park wieder grün.	Au printemps, le parc redevient vert.	A1
+jaune	gelb	Couleurs, Adjectif			Die Post in Deutschland ist gelb.	La poste en Allemagne est jaune.	A1
+noir / blanc	schwarz / weiß	Couleurs, Adjectif			Ich trinke meinen Kaffee schwarz, ohne Milch.	Je bois mon café noir, sans lait.	A1
+gris / marron	grau / braun	Couleurs, Adjectif			Er trägt eine graue Hose und braune Schuhe.	Il porte un pantalon gris et des chaussures marron.	A1
+orange / rose / violet	orange / rosa / lila	Couleurs, Adjectif			Meine Tochter mag Rosa und Lila.	Ma fille aime le rose et le violet.	A1
+clair / foncé	hell / dunkel	Couleurs, Adjectif			Im Winter ist es um fünf Uhr schon dunkel.	En hiver, il fait déjà nuit à cinq heures.	A1
+les grands-parents	die Großeltern (pluriel)	Famille, Nom	die Großeltern		Meine Großeltern wohnen auf dem Land.	Mes grands-parents habitent à la campagne.	A1
+mamie / papi	die Oma / der Opa	Famille, Nom	die Omas / die Opas		Am Sonntag besuchen wir Oma und Opa.	Dimanche, nous rendons visite à mamie et papi.	A1
+l'oncle / la tante	der Onkel / die Tante	Famille, Nom	die Onkel / die Tanten		Mein Onkel wohnt in Hamburg.	Mon oncle habite à Hambourg.	A1
+le cousin / la cousine	der Cousin / die Cousine	Famille, Nom	die Cousins / die Cousinen		Meine Cousine heiratet im Sommer.	Ma cousine se marie cet été.	A1
+les frères et sœurs	die Geschwister (pluriel)	Famille, Nom	die Geschwister		Hast du Geschwister? – Ja, einen Bruder.	Tu as des frères et sœurs ? – Oui, un frère.	A1
+le bébé	das Baby	Famille, Nom	die Babys		Psst, das Baby schläft gerade im Schlafzimmer.	Chut, le bébé est en train de dormir dans la chambre.	A1
+le garçon / la fille	der Junge / das Mädchen	Famille, Nom	die Jungen / die Mädchen		In meiner Klasse sind zehn Jungen und zwölf Mädchen.	Dans ma classe, il y a dix garçons et douze filles.	A1
+marié / célibataire	verheiratet / ledig	Famille, Adjectif			Sind Sie verheiratet oder ledig?	Êtes-vous marié ou célibataire ?	A1
+divorcé	geschieden	Famille, Adjectif			Meine Eltern sind seit zehn Jahren geschieden.	Mes parents sont divorcés depuis dix ans.	A1
+se marier, épouser	heiraten	Famille, Verbe		hat geheiratet	Wir heiraten nächstes Jahr im Mai.	Nous nous marions l'année prochaine en mai.	A1
+le pays	das Land	Pays, Nom	die Länder		Aus welchem Land kommen Sie?	De quel pays venez-vous ?	A1
+l'Allemagne	Deutschland	Pays, Nom	—		Ich lebe seit einem Jahr in Deutschland.	Je vis en Allemagne depuis un an.	A1
+la France	Frankreich	Pays, Nom	—		Frankreich ist ein Nachbarland von Deutschland.	La France est un pays voisin de l'Allemagne.	A1
+la Suisse	die Schweiz	Pays, Nom	—		Im Sommer fahren wir in die Schweiz.	Cet été, nous allons en Suisse.	A1
+l'Autriche	Österreich	Pays, Nom	—		Wien ist die Hauptstadt von Österreich.	Vienne est la capitale de l'Autriche.	A1
+l'Italie / l'Espagne	Italien / Spanien	Pays, Nom	—		Im Urlaub fliegen wir nach Spanien.	Pendant les vacances, nous prenons l'avion pour l'Espagne.	A1
+l'Angleterre / la Grande-Bretagne	England / Großbritannien	Pays, Nom	—		Sie hat zwei Jahre in England gearbeitet.	Elle a travaillé deux ans en Angleterre.	A1
+les États-Unis	die USA (pluriel)	Pays, Nom	die USA		Unsere Firma hat auch Kunden in den USA.	Notre entreprise a aussi des clients aux États-Unis.	A1
+l'étranger	das Ausland	Pays, Voyage, Nom	—		Sie hat ein Jahr im Ausland studiert.	Elle a étudié un an à l'étranger.	A1
+l'Allemand / l'Allemande	der Deutsche / die Deutsche	Pays, Nom	die Deutschen		Mein Mann ist Deutscher, ich bin Französin.	Mon mari est allemand, je suis française.	A1
+le Français / la Française	der Franzose / die Französin	Pays, Nom	die Franzosen / die Französinnen		In meinem Kurs sind zwei Franzosen.	Dans mon cours, il y a deux Français.	A1
+allemand / français (adjectif)	deutsch / französisch	Pays, Adjectif			Ich mag das französische Essen sehr.	J'aime beaucoup la cuisine française.	A1
+la langue	die Sprache	Pays, École, Nom	die Sprachen		Wie viele Sprachen sprichst du?	Combien de langues parles-tu ?	A1
+l'allemand (langue)	Deutsch	Pays, École, Nom	—		Ich lerne seit sechs Monaten Deutsch.	J'apprends l'allemand depuis six mois.	A1
+le français (langue)	Französisch	Pays, École, Nom	—		Kannst du mir das auf Französisch erklären?	Tu peux m'expliquer ça en français ?	A1
+l'anglais / l'italien / l'espagnol (langues)	Englisch / Italienisch / Spanisch	Pays, École, Nom	—		In der Firma sprechen wir oft Englisch.	Dans l'entreprise, nous parlons souvent anglais.	A1
+s'appeler	heißen	Bases, Verbe		hat geheißen	Wie heißt die neue Kollegin?	Comment s'appelle la nouvelle collègue ?	A1
+le nom	der Name	Bases, Nom	die Namen		Bitte schreiben Sie Ihren Namen hier.	Veuillez écrire votre nom ici.	A1
+le prénom	der Vorname	Bases, Nom	die Vornamen		Mein Vorname ist Luca, mein Nachname Martin.	Mon prénom est Luca, mon nom de famille Martin.	A1
+le nom de famille	der Nachname / der Familienname	Bases, Nom	die Nachnamen / die Familiennamen		Wie ist Ihr Nachname, bitte?	Quel est votre nom de famille, s'il vous plaît ?	A1
+l'adresse	die Adresse	Bases, Logement, Nom	die Adressen		Können Sie mir Ihre Adresse geben?	Pouvez-vous me donner votre adresse ?	A1
+le numéro de téléphone	die Telefonnummer	Bases, Téléphone, Nom	die Telefonnummern		Hast du die Telefonnummer vom Arzt?	Tu as le numéro de téléphone du médecin ?	A1
+le code postal	die Postleitzahl	Bases, Banque & Poste, Nom	die Postleitzahlen		Die Postleitzahl von meinem Ort ist 80331.	Le code postal de ma ville est 80331.	A1
+la date de naissance	das Geburtsdatum	Bases, Nom	die Geburtsdaten		Bitte tragen Sie Ihr Geburtsdatum ein.	Veuillez indiquer votre date de naissance.	A1
+l'âge	das Alter	Bases, Nom	—		Bitte geben Sie auch Ihr Alter an.	Veuillez aussi indiquer votre âge.	A1
+la nationalité	die Staatsangehörigkeit	Bases, Pays, Nom	die Staatsangehörigkeiten		Welche Staatsangehörigkeit haben Sie? – Die französische.	Quelle est votre nationalité ? – Française.	A1
+le formulaire	das Formular	Bases, Société, Nom	die Formulare		Bitte füllen Sie dieses Formular aus.	Veuillez remplir ce formulaire.	A1
+la signature	die Unterschrift	Bases, Nom	die Unterschriften		Hier fehlt noch Ihre Unterschrift.	Il manque encore votre signature ici.	A1
+la carte d'identité	der Ausweis / der Personalausweis	Bases, Voyage, Nom	die Ausweise / die Personalausweise		Haben Sie Ihren Ausweis dabei?	Avez-vous votre carte d'identité sur vous ?	A1
+masculin / féminin	männlich / weiblich	Bases, Adjectif			Kreuzen Sie bitte männlich oder weiblich an.	Cochez masculin ou féminin, s'il vous plaît.	A1
+épeler	buchstabieren	Bases, Comprendre, Verbe		hat buchstabiert	Können Sie Ihren Namen bitte buchstabieren?	Pouvez-vous épeler votre nom, s'il vous plaît ?	A1
+s'inscrire, se déclarer (à la mairie)	sich anmelden	Bases, Société, Verbe		hat sich angemeldet	Ich muss mich noch beim Bürgeramt anmelden.	Je dois encore me déclarer au bureau des citoyens.	A1
+Quel âge as-tu ? / J'ai … ans	Wie alt bist du? / Ich bin … Jahre alt	Bases, Phrase			Wie alt bist du? – Ich bin 32 Jahre alt.	Quel âge as-tu ? – J'ai 32 ans.	A1
+le balcon	der Balkon	Logement, Nom	die Balkone		Im Sommer frühstücken wir auf dem Balkon.	En été, nous prenons le petit-déjeuner sur le balcon.	A1
+le jardin	der Garten	Logement, Nom	die Gärten		Das Haus hat einen kleinen Garten.	La maison a un petit jardin.	A1
+l'escalier	die Treppe	Logement, Nom	die Treppen		Der Aufzug ist kaputt, wir nehmen die Treppe.	L'ascenseur est en panne, nous prenons l'escalier.	A1
+la lumière	das Licht	Logement, Nom	die Lichter		Kannst du bitte das Licht anmachen?	Tu peux allumer la lumière, s'il te plaît ?	A1
+les meubles	die Möbel (pluriel)	Logement, Nom	die Möbel		Wir müssen noch Möbel für die Wohnung kaufen.	Nous devons encore acheter des meubles pour l'appartement.	A1
+l'armoire, le placard	der Schrank	Logement, Nom	die Schränke		Die Teller sind im Schrank links.	Les assiettes sont dans le placard à gauche.	A1
+le canapé	das Sofa	Logement, Nom	die Sofas		Abends liege ich gern auf dem Sofa.	Le soir, j'aime m'allonger sur le canapé.	A1
+le réfrigérateur	der Kühlschrank	Logement, Nourriture, Nom	die Kühlschränke		Die Milch steht im Kühlschrank.	Le lait est dans le réfrigérateur.	A1
+la machine à laver	die Waschmaschine	Logement, Nom	die Waschmaschinen		Die Waschmaschine ist im Keller.	La machine à laver est à la cave.	A1
+le lave-vaisselle	die Spülmaschine	Logement, Nom	die Spülmaschinen		Kannst du bitte die Spülmaschine ausräumen?	Tu peux vider le lave-vaisselle, s'il te plaît ?	A1
+la douche / la baignoire	die Dusche / die Badewanne	Logement, Nom	die Duschen / die Badewannen		Das Bad hat leider nur eine Dusche.	La salle de bain n'a malheureusement qu'une douche.	A1
+la télévision (appareil)	der Fernseher	Logement, Médias, Nom	die Fernseher		Der Fernseher steht im Wohnzimmer.	La télévision est dans le salon.	A1
+le téléphone portable	das Handy	Bases, Téléphone, Nom	die Handys		Mein Handy ist leer, ich muss es aufladen.	Mon portable est déchargé, je dois le recharger.	A1
+l'assiette	der Teller	Logement, Nourriture, Nom	die Teller		Stell bitte die Teller auf den Tisch.	Mets les assiettes sur la table, s'il te plaît.	A1
+le verre	das Glas	Logement, Nourriture, Nom	die Gläser		Ich hätte gern ein Glas Wasser.	Je voudrais un verre d'eau.	A1
+le couteau / la fourchette / la cuillère	das Messer / die Gabel / der Löffel	Logement, Nourriture, Nom	die Messer / die Gabeln / die Löffel		Entschuldigung, mir fehlt noch eine Gabel.	Excusez-moi, il me manque encore une fourchette.	A1
+les ordures, les déchets	der Müll	Logement, Environnement, Nom	—		Kannst du heute den Müll rausbringen?	Tu peux sortir les poubelles aujourd'hui ?	A1
+à la maison / à la maison (direction)	zu Hause / nach Hause	Logement, Mot outil			Ich bin um sechs Uhr zu Hause.	Je suis à la maison à six heures.	A1
+nettoyer	putzen	Logement, Verbe		hat geputzt	Am Samstag putze ich die Wohnung.	Le samedi, je fais le ménage dans l'appartement.	A1
+laver	waschen	Logement, Verbe		hat gewaschen	Ich muss heute noch Wäsche waschen.	Je dois encore faire la lessive aujourd'hui.	A1
+faire la vaisselle	abwaschen / spülen	Logement, Verbe		hat abgewaschen / hat gespült	Wer wäscht heute nach dem Essen ab?	Qui fait la vaisselle après le repas aujourd'hui ?	A1
+louer (en tant que locataire)	mieten	Logement, Verbe		hat gemietet	Wir haben eine Wohnung in der Stadt gemietet.	Nous avons loué un appartement en ville.	A1
+le repas, la nourriture	das Essen	Nourriture, Nom	die Essen		Das Essen in der Kantine ist gut.	La nourriture à la cantine est bonne.	A1
+le beurre	die Butter	Nourriture, Nom	—		Ich esse Brot mit Butter und Marmelade.	Je mange du pain avec du beurre et de la confiture.	A1
+le sucre / le sel	der Zucker / das Salz	Nourriture, Nom	—		Nimmst du Zucker in den Kaffee?	Tu prends du sucre dans ton café ?	A1
+le riz	der Reis	Nourriture, Nom	—		Heute gibt es Hähnchen mit Reis.	Aujourd'hui, il y a du poulet avec du riz.	A1
+la nouille (les pâtes)	die Nudel	Nourriture, Nom	die Nudeln		Die Kinder essen am liebsten Nudeln mit Tomatensoße.	Les enfants préfèrent les pâtes à la sauce tomate.	A1
+la soupe	die Suppe	Nourriture, Restaurant, Nom	die Suppen		Als Vorspeise nehme ich die Suppe.	En entrée, je prends la soupe.	A1
+la salade	der Salat	Nourriture, Nom	die Salate		Zum Mittagessen esse ich oft einen Salat.	Au déjeuner, je mange souvent une salade.	A1
+le poulet	das Hähnchen	Nourriture, Nom	die Hähnchen		Das Hähnchen mit Pommes ist sehr lecker.	Le poulet-frites est très bon.	A1
+la saucisse	die Wurst	Nourriture, Nom	die Würste		Am Kiosk kaufe ich eine Wurst mit Senf.	Au kiosque, j'achète une saucisse avec de la moutarde.	A1
+la pomme	der Apfel	Nourriture, Nom	die Äpfel		Ein Kilo Äpfel kostet drei Euro.	Un kilo de pommes coûte trois euros.	A1
+le jus	der Saft	Nourriture, Restaurant, Nom	die Säfte		Ich hätte gern einen Orangensaft.	Je voudrais un jus d'orange.	A1
+le thé	der Tee	Nourriture, Restaurant, Nom	die Tees		Am Abend trinke ich lieber Tee.	Le soir, je préfère boire du thé.	A1
+le morceau, la part	das Stück	Nourriture, Achats, Nom	die Stücke		Möchtest du noch ein Stück Kuchen?	Tu veux encore un morceau de gâteau ?	A1
+la bouteille	die Flasche	Nourriture, Achats, Nom	die Flaschen		Bringst du bitte eine Flasche Wasser mit?	Tu rapportes une bouteille d'eau, s'il te plaît ?	A1
+le kilo / le gramme	das Kilo / das Gramm	Nourriture, Achats, Nom	die Kilos / die Gramm		Ich hätte gern 200 Gramm Käse.	Je voudrais 200 grammes de fromage.	A1
+J'ai faim / J'ai soif	Ich habe Hunger / Ich habe Durst	Nourriture, Phrase			Ich habe Hunger, gehen wir essen?	J'ai faim, on va manger ?	A1
+frais	frisch	Nourriture, Adjectif			Das Brot ist ganz frisch vom Bäcker.	Le pain est tout frais de chez le boulanger.	A1
+sucré / acide	süß / sauer	Nourriture, Adjectif			Der Kuchen ist mir zu süß.	Le gâteau est trop sucré pour moi.	A1
+avoir bon goût	schmecken	Nourriture, Verbe		hat geschmeckt	Hat Ihnen das Essen gut geschmeckt?	Le repas vous a plu ?	A1
+commander	bestellen	Nourriture, Restaurant, Verbe		hat bestellt	Wir möchten jetzt bestellen, bitte.	Nous voudrions commander maintenant, s'il vous plaît.	A1
+prendre le petit-déjeuner	frühstücken	Nourriture, Verbe		hat gefrühstückt	Ich frühstücke meistens um sieben Uhr.	Je prends généralement le petit-déjeuner à sept heures.	A1
+goûter, essayer	probieren	Nourriture, Verbe		hat probiert	Möchtest du den Käse mal probieren?	Tu veux goûter le fromage ?	A1
+la poste	die Post	Ville, Banque & Poste, Nom	—		Ich muss noch ein Paket zur Post bringen.	Je dois encore porter un colis à la poste.	A1
+la banque	die Bank	Ville, Banque & Poste, Nom	die Banken		Die Bank ist am Samstag geschlossen.	La banque est fermée le samedi.	A1
+l'église	die Kirche	Ville, Nom	die Kirchen		Die Kirche liegt mitten in der Altstadt.	L'église se trouve au milieu de la vieille ville.	A1
+la mairie	das Rathaus	Ville, Société, Nom	die Rathäuser		Das Rathaus ist neben der Kirche.	La mairie est à côté de l'église.	A1
+le marché	der Markt	Ville, Achats, Nom	die Märkte		Am Samstag kaufe ich Obst auf dem Markt.	Le samedi, j'achète des fruits au marché.	A1
+le parc	der Park	Ville, Loisirs, Nom	die Parks		Nach dem Essen gehen wir im Park spazieren.	Après le repas, nous allons nous promener dans le parc.	A1
+le cinéma	das Kino	Ville, Loisirs, Nom	die Kinos		Gehen wir heute Abend ins Kino?	On va au cinéma ce soir ?	A1
+la police	die Polizei	Ville, Société, Nom	—		Bei einem Unfall rufen Sie die Polizei.	En cas d'accident, appelez la police.	A1
+le centre-ville	die Innenstadt / das Zentrum	Ville, Nom	die Innenstädte / die Zentren		Das Hotel liegt direkt im Zentrum.	L'hôtel est situé en plein centre-ville.	A1
+le village	das Dorf	Ville, Nom	die Dörfer		Meine Eltern wohnen in einem kleinen Dorf.	Mes parents habitent dans un petit village.	A1
+le feu (de circulation)	die Ampel	Ville, Transports, Nom	die Ampeln		Gehen Sie an der Ampel links.	Au feu, tournez à gauche.	A1
+le tramway	die Straßenbahn	Transports, Nom	die Straßenbahnen		Ich fahre jeden Tag mit der Straßenbahn zur Arbeit.	Je vais au travail en tram tous les jours.	A1
+le métro / le RER	die U-Bahn / die S-Bahn	Transports, Nom	die U-Bahnen / die S-Bahnen		Mit der U-Bahn sind es nur zehn Minuten.	En métro, ce n'est qu'à dix minutes.	A1
+le taxi	das Taxi	Transports, Nom	die Taxis		Nach Mitternacht nehmen wir ein Taxi.	Après minuit, nous prenons un taxi.	A1
+l'horaire (des transports)	der Fahrplan	Transports, Nom	die Fahrpläne		Laut Fahrplan kommt der Bus um 8:15 Uhr.	D'après l'horaire, le bus arrive à 8 h 15.	A1
+le départ / l'arrivée	die Abfahrt / die Ankunft	Transports, Voyage, Nom	die Abfahrten / die Ankünfte		Die Abfahrt ist um zehn, die Ankunft um zwölf.	Le départ est à dix heures, l'arrivée à midi.	A1
+le voyage	die Reise	Voyage, Nom	die Reisen		Die Reise nach Wien war sehr schön.	Le voyage à Vienne était très beau.	A1
+le chemin	der Weg	Ville, Transports, Nom	die Wege		Können Sie mir den Weg zum Bahnhof zeigen?	Pouvez-vous m'indiquer le chemin de la gare ?	A1
+à pied	zu Fuß	Transports, Mot outil			Ich gehe immer zu Fuß ins Büro.	Je vais toujours au bureau à pied.	A1
+Aller simple ou aller-retour ?	Einfach oder hin und zurück?	Transports, Voyage, Phrase			Einfach oder hin und zurück? – Hin und zurück, bitte.	Aller simple ou aller-retour ? – Aller-retour, s'il vous plaît.	A1
+marcher, courir	laufen	Transports, Loisirs, Verbe		ist gelaufen	Bis zum Bahnhof laufe ich zehn Minuten.	Je marche dix minutes jusqu'à la gare.	A1
+la robe	das Kleid	Vêtements, Nom	die Kleider		Sie trägt heute ein rotes Kleid.	Elle porte une robe rouge aujourd'hui.	A1
+le pull	der Pullover / der Pulli	Vêtements, Nom	die Pullover / die Pullis		Nimm einen Pullover mit, es wird kalt.	Prends un pull, il va faire froid.	A1
+le bonnet / l'écharpe	die Mütze / der Schal	Vêtements, Nom	die Mützen / die Schals		Im Winter trage ich Mütze und Schal.	En hiver, je porte un bonnet et une écharpe.	A1
+le costume	der Anzug	Vêtements, Travail, Nom	die Anzüge		Zum Vorstellungsgespräch trägt er einen Anzug.	Pour l'entretien d'embauche, il porte un costume.	A1
+les lunettes	die Brille	Vêtements, Santé, Nom	die Brillen		Ich kann ohne Brille nicht gut lesen.	Je ne peux pas bien lire sans lunettes.	A1
+mettre / enlever (un vêtement)	anziehen / ausziehen	Vêtements, Verbe		hat angezogen / hat ausgezogen	Zieh dir eine warme Jacke an!	Mets une veste chaude !	A1
+essayer (un vêtement)	anprobieren	Vêtements, Achats, Verbe		hat anprobiert	Kann ich die Hose anprobieren?	Je peux essayer le pantalon ?	A1
+aller (taille), convenir	passen	Vêtements, Achats, Verbe		hat gepasst	Die Schuhe passen mir leider nicht.	Les chaussures ne me vont malheureusement pas.	A1
+le nez / la bouche	die Nase / der Mund	Corps, Nom	die Nasen / die Münder		Meine Nase läuft, ich bin erkältet.	J'ai le nez qui coule, je suis enrhumé.	A1
+l'oreille	das Ohr	Corps, Nom	die Ohren		Das Kind hat Schmerzen im Ohr.	L'enfant a mal à l'oreille.	A1
+le cheveu (les cheveux)	das Haar	Corps, Nom	die Haare		Sie hat lange, dunkle Haare.	Elle a de longs cheveux foncés.	A1
+le cou, la gorge	der Hals	Corps, Santé, Nom	die Hälse		Ich habe Halsschmerzen und Fieber.	J'ai mal à la gorge et de la fièvre.	A1
+l'épaule	die Schulter	Corps, Nom	die Schultern		Nach dem Sport tut mir die Schulter weh.	Après le sport, j'ai mal à l'épaule.	A1
+faire mal	wehtun	Corps, Santé, Verbe		hat wehgetan	Mir tut der Kopf weh.	J'ai mal à la tête.	A1
+le professeur / la professeure	der Lehrer / die Lehrerin	Métiers, École, Nom	die Lehrer / die Lehrerinnen		Unsere Lehrerin spricht sehr deutlich.	Notre professeure parle très clairement.	A1
+le vendeur / la vendeuse	der Verkäufer / die Verkäuferin	Métiers, Achats, Nom	die Verkäufer / die Verkäuferinnen		Die Verkäuferin hilft mir bei der Größe.	La vendeuse m'aide pour la taille.	A1
+le cuisinier / la cuisinière	der Koch / die Köchin	Métiers, Nom	die Köche / die Köchinnen		Er arbeitet als Koch in einem Hotel.	Il travaille comme cuisinier dans un hôtel.	A1
+le serveur / la serveuse	der Kellner / die Kellnerin	Métiers, Restaurant, Nom	die Kellner / die Kellnerinnen		Der Kellner bringt gleich die Speisekarte.	Le serveur apporte tout de suite la carte.	A1
+l'ingénieur / l'ingénieure	der Ingenieur / die Ingenieurin	Métiers, Travail, Nom	die Ingenieure / die Ingenieurinnen		Meine Schwester ist Ingenieurin bei Siemens.	Ma sœur est ingénieure chez Siemens.	A1
+l'infirmier / l'infirmière	der Krankenpfleger / die Krankenpflegerin	Métiers, Santé, Nom	die Krankenpfleger / die Krankenpflegerinnen		Die Krankenpflegerin misst das Fieber.	L'infirmière prend la température.	A1
+le coiffeur / la coiffeuse	der Friseur / die Friseurin	Métiers, Nom	die Friseure / die Friseurinnen		Ich habe morgen einen Termin beim Friseur.	J'ai rendez-vous chez le coiffeur demain.	A1
+l'informaticien / l'informaticienne	der Informatiker / die Informatikerin	Métiers, Travail, Nom	die Informatiker / die Informatikerinnen		Als Informatiker arbeite ich oft im Homeoffice.	En tant qu'informaticien, je travaille souvent en télétravail.	A1
+l'employé / l'employée	der / die Angestellte	Métiers, Travail, Nom	die Angestellten		Die Firma hat fünfzig Angestellte.	L'entreprise a cinquante employés.	A1
+au chômage	arbeitslos	Métiers, Travail, Adjectif			Er ist seit drei Monaten arbeitslos.	Il est au chômage depuis trois mois.	A1
+l'étudiant / l'étudiante	der Student / die Studentin	École, Nom	die Studenten / die Studentinnen		Viele Studenten arbeiten am Wochenende.	Beaucoup d'étudiants travaillent le week-end.	A1
+l'élève	der Schüler / die Schülerin	École, Nom	die Schüler / die Schülerinnen		Die Schüler haben heute keine Schule.	Les élèves n'ont pas école aujourd'hui.	A1
+étudier (à l'université)	studieren	École, Verbe		hat studiert	Ich habe in Lyon Informatik studiert.	J'ai étudié l'informatique à Lyon.	A1
+l'école	die Schule	École, Nom	die Schulen		Die Schule beginnt um acht Uhr.	L'école commence à huit heures.	A1
+l'université	die Universität / die Uni	École, Nom	die Universitäten / die Unis		Meine Tochter geht jetzt auf die Uni.	Ma fille va maintenant à la fac.	A1
+le cours	der Kurs	École, Nom	die Kurse		Ich mache einen Deutschkurs an der Volkshochschule.	Je suis un cours d'allemand à l'université populaire.	A1
+les cours, l'enseignement	der Unterricht	École, Nom	—		Der Unterricht fällt heute aus.	Le cours est annulé aujourd'hui.	A1
+les devoirs	die Hausaufgabe	École, Nom	die Hausaufgaben		Hast du deine Hausaufgaben schon gemacht?	Tu as déjà fait tes devoirs ?	A1
+l'examen	die Prüfung	École, Nom	die Prüfungen		Im Juni mache ich die Prüfung für A2.	En juin, je passe l'examen de niveau A2.	A1
+le mot	das Wort	École, Comprendre, Nom	die Wörter		Dieses Wort kenne ich nicht.	Je ne connais pas ce mot.	A1
+la phrase	der Satz	École, Comprendre, Nom	die Sätze		Bitte bilden Sie einen Satz mit diesem Wort.	Formez une phrase avec ce mot, s'il vous plaît.	A1
+l'exercice	die Übung	École, Nom	die Übungen		Machen Sie bitte Übung drei zu Hause.	Faites l'exercice trois à la maison, s'il vous plaît.	A1
+la faute, l'erreur	der Fehler	École, Travail, Nom	die Fehler		Im Text sind noch zwei Fehler.	Il y a encore deux fautes dans le texte.	A1
+le stylo / le crayon	der Kugelschreiber / der Bleistift	École, Nom	die Kugelschreiber / die Bleistifte		Hast du einen Kugelschreiber für mich?	Tu as un stylo pour moi ?	A1
+le dictionnaire	das Wörterbuch	École, Nom	die Wörterbücher		Ich suche das Wort im Wörterbuch.	Je cherche le mot dans le dictionnaire.	A1
+s'entraîner, pratiquer	üben	École, Verbe		hat geübt	Ich übe jeden Tag zehn Minuten Deutsch.	Je pratique l'allemand dix minutes chaque jour.	A1
+répéter, réviser	wiederholen	École, Verbe		hat wiederholt	Vor der Prüfung wiederhole ich die Wörter.	Avant l'examen, je révise les mots.	A1
+écouter, entendre	hören	Comprendre, Verbe		hat gehört	Ich höre im Auto gern Musik.	En voiture, j'aime écouter de la musique.	A1
+cocher	ankreuzen	École, Verbe		hat angekreuzt	Kreuzen Sie die richtige Antwort an.	Cochez la bonne réponse.	A1
+Pardon ? Comment ?	Wie bitte?	Comprendre, Phrase			Wie bitte? Ich habe Sie nicht verstanden.	Pardon ? Je ne vous ai pas compris.	A1
+janvier, février, mars	der Januar, der Februar, der März	Temps, Nom	—		Im Januar ist es oft sehr kalt.	En janvier, il fait souvent très froid.	A1
+avril, mai, juin	der April, der Mai, der Juni	Temps, Nom	—		Mein Geburtstag ist im Juni.	Mon anniversaire est en juin.	A1
+juillet, août, septembre	der Juli, der August, der September	Temps, Nom	—		Im August mache ich drei Wochen Urlaub.	En août, je prends trois semaines de vacances.	A1
+octobre, novembre, décembre	der Oktober, der November, der Dezember	Temps, Nom	—		Im Dezember gibt es viele Weihnachtsmärkte.	En décembre, il y a beaucoup de marchés de Noël.	A1
+la date	das Datum	Temps, Nom	die Daten		Bitte schreiben Sie das Datum oben rechts.	Écrivez la date en haut à droite, s'il vous plaît.	A1
+Le combien sommes-nous ? / Nous sommes le…	Der Wievielte ist heute? / Heute ist der …	Temps, Phrase			Der Wievielte ist heute? – Heute ist der zwölfte.	Le combien sommes-nous ? – Nous sommes le douze.	A1
+Quand est ton anniversaire ?	Wann hast du Geburtstag?	Famille, Temps, Phrase			Wann hast du Geburtstag? – Am dritten März.	Quand est ton anniversaire ? – Le trois mars.	A1
+Il est trois heures et quart / moins le quart	Es ist Viertel nach drei / Viertel vor drei	Temps, Phrase			Es ist schon Viertel nach drei, wir müssen los.	Il est déjà trois heures et quart, nous devons y aller.	A1
+le temps (durée)	die Zeit	Temps, Nom	die Zeiten		Die Zeit vergeht so schnell.	Le temps passe si vite.	A1
+la nuit	die Nacht	Temps, Nom	die Nächte		Gute Nacht und schlaf gut!	Bonne nuit et dors bien !	A1
+la nuit (adverbe)	in der Nacht / nachts	Temps, Mot outil			Nachts fahren hier keine Busse.	La nuit, il n'y a pas de bus ici.	A1
+après-demain / avant-hier	übermorgen / vorgestern	Temps, Mot outil			Übermorgen fliege ich nach Paris.	Après-demain, je prends l'avion pour Paris.	A1
+tout de suite, bientôt	gleich	Temps, Mot outil			Warte kurz, ich bin gleich fertig.	Attends un peu, j'ai bientôt fini.	A1
+ensuite, après	danach	Temps, Connecteur			Erst arbeite ich, danach gehe ich einkaufen.	D'abord je travaille, ensuite je vais faire les courses.	A1
+rarement	selten	Temps, Mot outil			Ich esse nur selten Fleisch.	Je mange rarement de la viande.	A1
+de nouveau, encore	wieder	Temps, Mot outil			Der Drucker funktioniert endlich wieder.	L'imprimante fonctionne enfin de nouveau.	A1
+ponctuel, à l'heure	pünktlich	Temps, Travail, Adjectif			Der Zug ist heute pünktlich.	Le train est à l'heure aujourd'hui.	A1
+À tout à l'heure ! / À bientôt !	Bis gleich! / Bis bald!	Bases, Phrase			Ich gehe kurz zur Post. Bis gleich!	Je vais vite à la poste. À tout de suite !	A1
+Bonne nuit !	Gute Nacht!	Bases, Phrase			Gute Nacht, bis morgen früh!	Bonne nuit, à demain matin !	A1
+Bienvenue !	Herzlich willkommen!	Bases, Phrase			Herzlich willkommen in unserem Team!	Bienvenue dans notre équipe !	A1
+Bon voyage !	Gute Reise!	Voyage, Phrase			Gute Reise und viel Spaß in Berlin!	Bon voyage et amuse-toi bien à Berlin !	A1
+Qu'est-ce que c'est ? / C'est…	Was ist das? / Das ist …	Bases, Phrase			Was ist das? – Das ist ein Wörterbuch.	Qu'est-ce que c'est ? – C'est un dictionnaire.	A1
+Qu'est-ce que tu aimes faire ?	Was machst du gern?	Loisirs, Conversation, Phrase			Was machst du gern in deiner Freizeit?	Qu'est-ce que tu aimes faire pendant ton temps libre ?	A1
+Et avec ceci ? / Ce sera tout	Sonst noch etwas? / Das ist alles	Achats, Phrase			Sonst noch etwas? – Nein, danke, das ist alles.	Et avec ceci ? – Non merci, ce sera tout.	A1
+Je prends…	Ich nehme …	Restaurant, Achats, Phrase			Ich nehme den Salat und ein Wasser.	Je prends la salade et une eau.	A1
+d'où ?	Woher?	Questions, Mot outil			Woher kennst du Anna? – Von der Arbeit.	D'où connais-tu Anna ? – Du travail.	A1
+qui ? à qui ? (accusatif / datif)	Wen? / Wem?	Questions, Mot outil			Wem gehört die Tasche hier auf dem Stuhl?	À qui est le sac qui est sur la chaise ?	A1
+combien de temps ?	Wie lange?	Questions, Mot outil			Wie lange dauert die Fahrt?	Combien de temps dure le trajet ?	A1
+à quelle fréquence ?	Wie oft?	Questions, Mot outil			Wie oft fährt der Bus?	Le bus passe tous les combien ?	A1
+depuis quand ?	Seit wann?	Questions, Mot outil			Seit wann wohnst du in Berlin?	Depuis quand habites-tu à Berlin ?	A1
+dans, en (lieu)	in (+ Dat. / + Akk.)	Préposition, Bases			Ich wohne in Köln und arbeite in der Stadt.	J'habite à Cologne et je travaille en ville.	A1
+à, contre (lieu, contact)	an (+ Dat. / + Akk.)	Préposition, Bases			Das Bild hängt an der Wand.	Le tableau est accroché au mur.	A1
+de, hors de (origine)	aus (+ Dat.)	Préposition, Bases			Ich komme aus Lyon, aber wohne in Berlin.	Je viens de Lyon, mais j'habite à Berlin.	A1
+de, par (provenance, auteur)	von (+ Dat.)	Préposition, Bases			Das ist ein Geschenk von meiner Schwester.	C'est un cadeau de ma sœur.	A1
+au-dessus de, sur (un sujet)	über (+ Dat. / + Akk.)	Préposition, Bases			Die Lampe hängt über dem Tisch.	La lampe est suspendue au-dessus de la table.	A1
+à (heure), autour de	um (+ Akk.)	Préposition, Temps			Das Meeting beginnt um neun Uhr.	La réunion commence à neuf heures.	A1
+à partir de	ab (+ Dat.)	Préposition, Temps			Ab Montag arbeite ich in Teilzeit.	À partir de lundi, je travaille à temps partiel.	A1
+à travers, par	durch (+ Akk.)	Préposition, Ville			Wir gehen durch den Park.	Nous traversons le parc à pied.	A1
+par (personne, unité)	pro	Préposition, Achats			Das Menü kostet 15 Euro pro Person.	Le menu coûte 15 euros par personne.	A1
+ne… pas	nicht	Bases, Mot outil			Ich komme heute nicht ins Büro.	Je ne viens pas au bureau aujourd'hui.	A1
+pas de, aucun	kein / keine	Bases, Mot outil			Ich habe heute keine Zeit und kein Geld.	Je n'ai ni temps ni argent aujourd'hui.	A1
+si (réponse à une question négative)	doch	Bases, Conversation, Mot outil			Kommst du nicht mit? – Doch, ich komme!	Tu ne viens pas ? – Si, je viens !	A1
+je, tu, il, elle	ich, du, er, sie, es	Bases, Mot outil			Er ist mein Kollege, sie ist meine Chefin.	Il est mon collègue, elle est ma cheffe.	A1
+nous, vous, ils / elles, vous (politesse)	wir, ihr, sie, Sie	Bases, Mot outil			Wir gehen essen. Kommt ihr mit?	Nous allons manger. Vous venez avec nous ?	A1
+mon, ton, son (à lui), son (à elle)	mein, dein, sein, ihr	Bases, Mot outil			Das ist mein Bruder und seine Frau.	C'est mon frère et sa femme.	A1
+notre, votre, leur, votre (politesse)	unser, euer, ihr, Ihr	Bases, Mot outil			Ist das Ihr Koffer? – Nein, das ist unser Koffer.	C'est votre valise ? – Non, c'est notre valise.	A1
+on	man	Bases, Mot outil			Hier darf man nicht rauchen.	On n'a pas le droit de fumer ici.	A1
+environ	ungefähr	Nombres, Mot outil			Die Fahrt dauert ungefähr eine Stunde.	Le trajet dure environ une heure.	A1
+assez, suffisamment	genug	Bases, Mot outil			Haben wir genug Brot für morgen?	Avons-nous assez de pain pour demain ?	A1
+en haut / en bas	oben / unten	Logement, Mot outil			Das Bad ist oben, die Küche unten.	La salle de bain est en haut, la cuisine en bas.	A1
+dedans / dehors	drinnen / draußen	Logement, Météo, Mot outil			Bei dem Wetter bleiben wir lieber drinnen.	Avec ce temps, nous préférons rester à l'intérieur.	A1
+gros / mince	dick / dünn	Corps, Adjectif			Der Hund ist ziemlich dick geworden.	Le chien a pas mal grossi.	A1
+aimable / désagréable	freundlich / unfreundlich	Sentiments, Adjectif			Die Leute im Büro sind sehr freundlich.	Les gens au bureau sont très aimables.	A1
+avantageux, bon marché	günstig	Achats, Adjectif			Im Supermarkt ist das Obst heute günstig.	Au supermarché, les fruits sont bon marché aujourd'hui.	A1
+gratuit	kostenlos	Achats, Adjectif			Der Eintritt ins Museum ist heute kostenlos.	L'entrée au musée est gratuite aujourd'hui.	A1
+cassé, en panne	kaputt	Logement, Adjectif			Die Kaffeemaschine ist schon wieder kaputt.	La machine à café est encore en panne.	A1
+seul	allein	Sentiments, Adjectif			Ich wohne allein in einer kleinen Wohnung.	J'habite seul dans un petit appartement.	A1
+drôle, amusant	lustig	Sentiments, Adjectif			Der Film war wirklich lustig.	Le film était vraiment drôle.	A1
+confortable	bequem	Logement, Vêtements, Adjectif			Die Schuhe sind sehr bequem.	Les chaussures sont très confortables.	A1
+peu	wenig	Bases, Mot outil			Ich habe diese Woche wenig Zeit.	J'ai peu de temps cette semaine.	A1
+interdit / autorisé	verboten / erlaubt	Société, Adjectif			Rauchen ist hier verboten, draußen ist es erlaubt.	Il est interdit de fumer ici, dehors c'est autorisé.	A1
+regarder la télévision	fernsehen	Loisirs, Médias, Verbe		hat ferngesehen	Am Abend sehe ich manchmal fern.	Le soir, je regarde parfois la télé.	A1
+vendre	verkaufen	Achats, Verbe		hat verkauft	Wir verkaufen unser altes Auto.	Nous vendons notre vieille voiture.	A1
+venir avec, accompagner	mitkommen	Loisirs, Verbe		ist mitgekommen	Kommst du mit ins Kino?	Tu viens avec nous au cinéma ?	A1
+emporter, emmener	mitnehmen	Voyage, Verbe		hat mitgenommen	Nimm einen Regenschirm mit, es regnet gleich.	Prends un parapluie, il va bientôt pleuvoir.	A1
+aller chercher (quelqu'un)	abholen	Transports, Verbe		hat abgeholt	Ich hole dich am Bahnhof ab.	Je viens te chercher à la gare.	A1
+raconter	erzählen	Conversation, Verbe		hat erzählt	Erzähl mal, wie war dein Urlaub?	Raconte, c'était comment tes vacances ?	A1
+téléphoner	telefonieren	Téléphone, Verbe		hat telefoniert	Ich telefoniere gerade mit meiner Mutter.	Je suis au téléphone avec ma mère.	A1
+ouvrir / fermer (familier)	aufmachen / zumachen	Bases, Verbe		hat aufgemacht / hat zugemacht	Kannst du bitte das Fenster zumachen?	Tu peux fermer la fenêtre, s'il te plaît ?	A1
+faire la connaissance de	kennenlernen	Conversation, Verbe		hat kennengelernt	Wir haben uns im Deutschkurs kennengelernt.	Nous nous sommes rencontrés au cours d'allemand.	A1
+devenir	werden	Bases, Verbe		ist geworden	Mein Sohn möchte Arzt werden.	Mon fils veut devenir médecin.	A1
+avoir le droit de, pouvoir	dürfen	Bases, Verbe		hat gedurft	Darf ich hier mein Auto parken?	Est-ce que j'ai le droit de garer ma voiture ici ?	A1
+devoir (consigne)	sollen	Bases, Verbe		hat gesollt	Der Arzt sagt, ich soll mehr trinken.	Le médecin dit que je dois boire plus.	A1
+se passer, arriver	passieren	Conversation, Verbe		ist passiert	Was ist passiert? Du siehst so traurig aus.	Qu'est-ce qui s'est passé ? Tu as l'air si triste.	A1

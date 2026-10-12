@@ -117,6 +117,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .section{display:flex;flex-direction:column;gap:14px}
 #gLv{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow:visible}
+#vLv{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;overflow:visible}
+#vLv .chip{padding:6px 4px;text-align:center}
 #gLv .chip{padding:6px 4px;text-align:center}
 #gLv .chip small{display:block;margin:0}
 .lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -157,6 +159,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   <div class="tabs" role="group" aria-label="Section"><button id="tabCards" aria-pressed="true">Cartes</button><button id="tabGram" aria-pressed="false">Grammaire</button></div>
   <div class="section" id="cardsSection">
   <div class="bar" id="bar" aria-hidden="true"></div>
+  <div class="chips" id="vLv" role="group" aria-label="Niveau"></div>
   <div class="chips" id="chips" role="group" aria-label="Tags"></div>
   <div class="row">
     <div class="seg" role="group" aria-label="Sens">
@@ -241,8 +244,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 </div>
 
 <script>
-const BASE = __CARDS__.map(c=>({id:c[0]+"|"+c[1],fr:c[0],de:c[1],tags:c[2],pl:c[3],pp:c[4],ex:c[5],exfr:c[6]}));
-const TAG_ORDER=["Phrase","Nom","Verbe","Adjectif","Mot outil","Connecteur","Préposition","Travail","Réunion","E-mail","Téléphone","Bases","Conversation","Comprendre","Questions","Voyage","Restaurant","Achats","Santé","Corps","Temps","Météo","Famille","Logement","Nourriture","Vêtements","Loisirs","Sentiments"];
+const BASE = __CARDS__.map(c=>({id:c[0]+"|"+c[1],fr:c[0],de:c[1],tags:c[2],pl:c[3],pp:c[4],ex:c[5],exfr:c[6],lv:c[7]||""}));
+const TAG_ORDER=["Phrase","Nom","Verbe","Adjectif","Mot outil","Connecteur","Préposition","Travail","Réunion","E-mail","Téléphone","Bases","Conversation","Comprendre","Questions","Voyage","Restaurant","Achats","Santé","Corps","Temps","Météo","Famille","Logement","Nourriture","Vêtements","Loisirs","Sentiments","Nombres","Couleurs","Pays","Ville","Transports","École","Métiers","Banque & Poste","Médias","Environnement","Société","Opinion"];
 const DAY=86400000, INTERVALS=[0,1,3,7,16,35];
 const KEY="deutsch-karten-v1";
 const SPEAKER='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
@@ -256,7 +259,9 @@ const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;"
 let CARDS=BASE, last=null, keep=false, cur=null, revealed=false, ahead=false, cram=null;
 
 function prog(c){return S.p[c.id]||{lvl:0,due:0,seen:false}}
-function pool(){return CARDS.filter(c=>S.tag==="Tout"||c.tags.includes(S.tag))}
+const VLV=["Tous","A1","A2","B1"];
+function inLevel(c){return !S.vlevel||S.vlevel==="Tous"||c.lv===S.vlevel}
+function pool(){return CARDS.filter(c=>inLevel(c)&&(S.tag==="Tout"||c.tags.includes(S.tag)))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function gramHTML(c){
   const out=[];
@@ -281,11 +286,12 @@ function nextCard(){
   return null;
 }
 function label(d){return d<=0?"tout à l'heure":d===1?"demain":"dans "+d+" j"}
-function tagName(){return S.tag==="Tout"?"tout":"« "+S.tag+" »"}
+function tagName(){const l=S.vlevel&&S.vlevel!=="Tous"?" "+S.vlevel:"";return S.tag==="Tout"?(l?"le niveau"+l:"tout"):"« "+S.tag+" »"+l}
 function startCram(){cram={queue:shuffle(pool().slice()),total:pool().length,done:0};S.view="cards";save();render()}
 
 function render(){
-  document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===S.tag));
+  document.querySelectorAll("#chips .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===S.tag));
+  document.querySelectorAll("#vLv .chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===(S.vlevel||"Tous")));
   $("dirFr").setAttribute("aria-pressed",S.dir==="fr"); $("dirDe").setAttribute("aria-pressed",S.dir==="de");
   $("modeOral").setAttribute("aria-pressed",!S.write); $("modeWrite").setAttribute("aria-pressed",!!S.write);
   $("viewCards").setAttribute("aria-pressed",S.view==="cards"); $("viewList").setAttribute("aria-pressed",S.view==="list");
@@ -296,7 +302,7 @@ function render(){
   const seen=P.length-nNew;
   $("bar").innerHTML=P.length?`<i style="width:${known/P.length*100}%;background:var(--good)"></i><i style="width:${(seen-known)/P.length*100}%;background:var(--hard)"></i>`:"";
   $("total").textContent=known+" / "+P.length+" bien sues";
-  const cramLabel="Tout réviser "+(S.tag==="Tout"?"":tagName()+" ")+"("+P.length+" cartes)";
+  const cramLabel="Tout réviser "+(S.tag==="Tout"&&(!S.vlevel||S.vlevel==="Tous")?"":tagName()+" ")+"("+P.length+" cartes)";
   $("cramBtn").textContent=cramLabel; $("doneCram").textContent=cramLabel; $("listCram").textContent="Réviser ces "+P.length+" cartes une par une";
   $("study").hidden=S.view!=="cards"; $("listView").hidden=S.view!=="list";
   if(S.view==="list") return renderList(P);
@@ -336,7 +342,7 @@ function renderCard(){
   $("g1d").textContent=label(INTERVALS[l1]); $("g2d").textContent=label(INTERVALS[l2]);
 }
 function renderList(P){
-  $("listCount").textContent=P.length+" cartes · "+(S.tag==="Tout"?"tous les tags":S.tag);
+  $("listCount").textContent=P.length+" cartes · "+(S.tag==="Tout"?"tous les tags":S.tag)+(S.vlevel&&S.vlevel!=="Tous"?" · "+S.vlevel:"");
   const hideDe=S.dir==="fr";
   $("maskBtn").textContent=S.mask?"Afficher les réponses":(hideDe?"Cacher l'allemand":"Cacher le français");
   $("words").innerHTML=P.map((c,i)=>{
@@ -441,19 +447,24 @@ if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pick
 
 function splitTags(s){return [...new Set(String(s||"").split(/[,|;\/]/).map(t=>t.trim()).filter(Boolean).map(t=>t[0].toUpperCase()+t.slice(1)))]}
 function rebuild(){
-  CARDS=S.custom.map(c=>({id:"m|"+c.fr+"|"+c.de,fr:c.fr,de:c.de,tags:c.tags.length?c.tags:["Mes cartes"],pl:c.pl||"",pp:c.pp||"",ex:c.ex||"",exfr:c.exfr||""})).concat(BASE);
-  const count={}; CARDS.forEach(c=>c.tags.forEach(t=>count[t]=(count[t]||0)+1));
+  CARDS=S.custom.map(c=>({id:"m|"+c.fr+"|"+c.de,fr:c.fr,de:c.de,tags:c.tags.length?c.tags:["Mes cartes"],pl:c.pl||"",pp:c.pp||"",ex:c.ex||"",exfr:c.exfr||"",lv:c.lv||""})).concat(BASE);
+  if(!VLV.includes(S.vlevel)) S.vlevel="Tous";
+  $("vLv").innerHTML="";
+  VLV.forEach(l=>{const b=document.createElement("button");b.className="chip";b.dataset.l=l;b.innerHTML=(l==="Tous"?"Tous niveaux":l)+"<small>"+CARDS.filter(c=>l==="Tous"||c.lv===l).length+"</small>";b.onclick=()=>{S.vlevel=l;ahead=false;cram=null;save();rebuild();render()};$("vLv").appendChild(b)});
+  const LC=CARDS.filter(inLevel);
+  const count={}; LC.forEach(c=>c.tags.forEach(t=>count[t]=(count[t]||0)+1));
   const tags=Object.keys(count).sort((a,b)=>{const ia=TAG_ORDER.indexOf(a),ib=TAG_ORDER.indexOf(b);return (ia<0?-1:ia)-(ib<0?-1:ib)||a.localeCompare(b,"fr")});
   if(S.tag!=="Tout"&&!count[S.tag]) S.tag="Tout";
   $("chips").innerHTML="";
-  [["Tout",CARDS.length],...tags.map(t=>[t,count[t]])].forEach(([t,n])=>{const b=document.createElement("button");b.className="chip";b.dataset.t=t;b.innerHTML=esc(t)+"<small>"+n+"</small>";b.onclick=()=>{S.tag=t;ahead=false;cram=null;save();render()};$("chips").appendChild(b)});
+  [["Tout",LC.length],...tags.map(t=>[t,count[t]])].forEach(([t,n])=>{const b=document.createElement("button");b.className="chip";b.dataset.t=t;b.innerHTML=esc(t)+"<small>"+n+"</small>";b.onclick=()=>{S.tag=t;ahead=false;cram=null;save();render()};$("chips").appendChild(b)});
   const ul=$("mine"); ul.innerHTML="";
   S.custom.forEach((c,i)=>{const li=document.createElement("li");li.innerHTML=`<span>${esc(c.fr)} → <b>${esc(c.de)}</b> <em>${esc(c.tags.join(", "))}</em></span><button>Supprimer</button>`;li.lastChild.onclick=()=>{S.custom.splice(i,1);save();rebuild();render()};ul.appendChild(li)});
 }
 function addCards(list){
   const have=new Set(CARDS.map(c=>c.fr+"|"+c.de)); let n=0;
   list.forEach(c=>{const fr=(c.fr||"").trim(),de=(c.de||"").trim();if(!fr||!de||have.has(fr+"|"+de))return;have.add(fr+"|"+de);
-    S.custom.unshift({fr,de,tags:splitTags(c.tags),pl:(c.pl||"").trim(),pp:(c.pp||"").trim(),ex:(c.ex||"").trim(),exfr:(c.exfr||"").trim()});n++});
+    const lv=String(c.lv||"").trim().toUpperCase();
+    S.custom.unshift({fr,de,lv:["A1","A2","B1","B2","C1","C2"].includes(lv)?lv:"",tags:splitTags(c.tags),pl:(c.pl||"").trim(),pp:(c.pp||"").trim(),ex:(c.ex||"").trim(),exfr:(c.exfr||"").trim()});n++});
   save();rebuild();render();return n;
 }
 function parseCSV(text){
@@ -470,7 +481,7 @@ function parseCSV(text){
   if(f||row.length){row.push(f);rows.push(row)}
   let r=rows.filter(x=>x.length>=2&&x[0].trim()&&x[1].trim());
   if(r.length&&/^(fr|français|francais|recto|front)$/i.test(r[0][0].trim()))r=r.slice(1);
-  return r.map(x=>({fr:x[0],de:x[1],tags:x[2],pl:x[3],pp:x[4],ex:x[5],exfr:x[6]}));
+  return r.map(x=>({fr:x[0],de:x[1],tags:x[2],pl:x[3],pp:x[4],ex:x[5],exfr:x[6],lv:x[7]}));
 }
 
 rebuild();

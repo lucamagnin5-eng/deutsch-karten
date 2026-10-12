@@ -1,11 +1,11 @@
 """Builds index.html and cartes-allemand.csv from src/app.html and src/parts/*.tsv."""
 import csv, glob, hashlib, json, pathlib
 root = pathlib.Path(__file__).parent
-# Columns: fr, de, tags (comma separated), pluriel, participe, exemple, traduction
+# Columns: fr, de, tags (comma separated), pluriel, participe, exemple, traduction, niveau
 rows = []
 for f in sorted(glob.glob(str(root / "src/parts/*.tsv"))):
     rows += list(csv.reader(open(f, encoding="utf-8"), delimiter="\t", quoting=csv.QUOTE_NONE))
-cards = [[r[0], r[1], [t.strip() for t in r[2].split(",") if t.strip()], r[3], r[4], r[5], r[6]] for r in rows]
+cards = [[r[0], r[1], [t.strip() for t in r[2].split(",") if t.strip()], r[3], r[4], r[5], r[6], r[7]] for r in rows]
 grammar = "\n".join(pathlib.Path(f).read_text(encoding="utf-8") for f in sorted(glob.glob(str(root / "src/grammaire/*.js"))))
 html = (root / "src/app.html").read_text(encoding="utf-8").replace("__CARDS__", json.dumps(cards, ensure_ascii=False)).replace("__GRAMMAR__", grammar)
 # The version changes whenever the content changes; the app compares it with version.json to update itself.
@@ -15,7 +15,7 @@ version = hashlib.sha1((html + (root / "src/sw.js").read_text(encoding="utf-8"))
 (root / "version.json").write_text(json.dumps({"version": version}) + "\n", encoding="utf-8")
 with open(root / "cartes-allemand.csv", "w", encoding="utf-8", newline="") as f:
     w = csv.writer(f)
-    w.writerow(["fr", "de", "tags", "pluriel", "participe", "exemple", "traduction"])
+    w.writerow(["fr", "de", "tags", "pluriel", "participe", "exemple", "traduction", "niveau"])
     for c in cards:
-        w.writerow([c[0], c[1], ", ".join(c[2]), c[3], c[4], c[5], c[6]])
+        w.writerow([c[0], c[1], ", ".join(c[2]), c[3], c[4], c[5], c[6], c[7]])
 print(len(cards), "cartes, version", version)

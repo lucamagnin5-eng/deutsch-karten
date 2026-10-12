@@ -1,5 +1,5 @@
 // Cache everything on install so the app opens without a connection.
-const CACHE = "deutsch-karten-8998e47cae";
+const CACHE = "deutsch-karten-6ade462bf3";
 const FILES = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
