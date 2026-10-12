@@ -57,6 +57,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .gram{display:flex;flex-direction:column;gap:2px;font-size:.95rem;color:var(--ink)}
 .gram span b{font-weight:400;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
 .hint{color:var(--muted);font-size:.9rem}
+.write{display:flex;flex-direction:column;gap:10px}
+.write .field input{font-size:17px}
+.write .field input.ok{border-color:var(--good);box-shadow:0 0 0 1px var(--good)}
+.write .field input.ko{border-color:var(--again);box-shadow:0 0 0 1px var(--again)}
+.res{font-size:.88rem;line-height:1.35}
+.res.ok{color:var(--good)} .res.ko{color:var(--again)} .res.near{color:var(--hard)}
+.grade button.sugg{outline:3px solid var(--ink);outline-offset:2px}
 .ex{margin-top:6px;border-left:3px solid var(--line);padding-left:10px;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
 .ex p{margin:0;line-height:1.4;overflow-wrap:anywhere}
 .ex .exde{font-style:italic;font-size:1rem}
@@ -123,6 +130,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       <button id="viewCards" aria-pressed="true">Cartes</button>
       <button id="viewList" aria-pressed="false">Liste</button>
     </div>
+    <div class="seg" role="group" aria-label="Réponse">
+      <button id="modeOral" aria-pressed="true">À l'oral</button>
+      <button id="modeWrite" aria-pressed="false">Écrire</button>
+    </div>
   </div>
 
   <div id="study">
@@ -132,6 +143,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
         <div class="meta"><span id="tagsLine"></span><span id="box"></span></div>
         <div class="face">
           <div class="q" id="q"></div>
+          <form class="write" id="writeForm" hidden autocomplete="off"><div class="write" id="fields"></div><button class="btn" type="submit" id="checkBtn">Vérifier</button></form>
           <div class="ans" id="ans" hidden>
             <div class="a" id="a"></div>
             <div class="gram" id="gram"></div>
@@ -236,6 +248,7 @@ function startCram(){cram={queue:shuffle(pool().slice()),total:pool().length,don
 function render(){
   document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===S.tag));
   $("dirFr").setAttribute("aria-pressed",S.dir==="fr"); $("dirDe").setAttribute("aria-pressed",S.dir==="de");
+  $("modeOral").setAttribute("aria-pressed",!S.write); $("modeWrite").setAttribute("aria-pressed",!!S.write);
   $("viewCards").setAttribute("aria-pressed",S.view==="cards"); $("viewList").setAttribute("aria-pressed",S.view==="list");
   const P=pool(), now=Date.now();
   let nNew=0,nDue=0,known=0;
@@ -279,6 +292,7 @@ function renderCard(){
     ?(isNoun?(cur.pl&&!cur.pl.startsWith("(")?"Dis le mot avec son article (der, die, das) et son pluriel.":"Dis le mot avec son article (der, die, das)."):isVerb?"Dis le verbe et son participe passé (hat / ist ...).":"Dis-le en allemand à voix haute, puis retourne la carte.")
     :"Écoute, essaie de comprendre, puis retourne la carte.";
   $("speak").hidden=S.dir==="fr";
+  setupWrite();
   const l1=Math.max(1,p.lvl), l2=Math.min(5,p.lvl+1);
   $("g1d").textContent=label(INTERVALS[l1]); $("g2d").textContent=label(INTERVALS[l2]);
 }
@@ -299,6 +313,65 @@ function renderList(P){
     const li=e.target.closest("li"); if(li) li.querySelectorAll(".masked").forEach(x=>x.classList.remove("masked"));
   };
 }
+// ---- Writing mode: type the answer, then compare ----
+const ART=/^(der|die|das)\s/i;
+function alts(s){
+  s=s.replace(/\(.*?\)/g,"").trim();
+  if(/^der \/ die /.test(s)) return ["der "+s.slice(10),"die "+s.slice(10)];
+  return s.split(" / ").map(x=>x.trim()).filter(Boolean);
+}
+function kind(c){
+  const a=alts(c.de);
+  if(c.tags.includes("Nom")&&a.every(x=>ART.test(x))&&!c.de.includes(",")) return "noun";
+  if(c.tags.includes("Verbe")&&c.pp) return "verb";
+  return "text";
+}
+function writing(){return S.write&&S.dir==="fr"&&!!cur}
+function setupWrite(){
+  const on=writing();
+  $("writeForm").hidden=!on; $("show").textContent=on?"Je ne sais pas":"Voir la réponse";
+  if(!on) return;
+  const k=kind(cur), F=[];
+  if(k==="noun") F.push(["w1","Article + nom","der Koffer"]);
+  else if(k==="verb") F.push(["w1","Infinitif","machen"],["w2","Participe passé (avec hat / ist)","hat gemacht"]);
+  else F.push(["w1","Réponse en allemand",""]);
+  $("fields").innerHTML=F.map(([id,l,ph])=>`<label class="field" for="${id}">${l}<input id="${id}" lang="de" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${ph}"></label><div class="res" id="${id}r" hidden></div>`).join("");
+  $("checkBtn").hidden=false;
+  const w2=$("w2"); if(w2) $("w1").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();w2.focus()}};
+  $("hint").textContent=k==="noun"?"Écris l'article et le nom (der, die ou das).":k==="verb"?"Écris l'infinitif, puis le participe passé avec hat ou ist.":"Écris la réponse en allemand.";
+  setTimeout(()=>{const i=$("w1");if(i&&!revealed)i.focus()},50);
+}
+function norm(s){return s.toLowerCase().replace(/\(.*?\)/g,"").replace(/\.\.\./g,"").replace(/[.,!?;:¿¡„“"«»]/g,"").replace(/\s+/g," ").trim()}
+function fold(s){return s.replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/ß/g,"ss")}
+function verdict(input,answers){
+  const v=norm(input); if(!v) return "ko";
+  const A=answers.map(norm);
+  if(A.includes(v)) return "ok";
+  const bare=s=>fold(s).replace(/ae/g,"a").replace(/oe/g,"o").replace(/ue/g,"u");
+  if(A.map(fold).includes(fold(v))||A.map(bare).includes(bare(v))) return "near";
+  return "ko";
+}
+function check(){
+  if(!cur||revealed) return;
+  const k=kind(cur), parts=[];
+  if(k==="noun") parts.push(["w1",alts(cur.de),"Réponse : "+cur.de]);
+  else if(k==="verb"){
+    const inf=alts(cur.de); parts.push(["w1",inf.concat(inf.filter(x=>x.startsWith("sich ")).map(x=>x.slice(5))),"Infinitif : "+alts(cur.de).join(" / ")]);
+    parts.push(["w2",alts(cur.pp),"Participe passé : "+cur.pp]);
+  } else parts.push(["w1",alts(cur.de),"Réponse : "+cur.de]);
+  let score=0;
+  parts.forEach(([id,ans,label])=>{
+    const inp=$(id), r=$(id+"r"), v=verdict(inp.value,ans);
+    inp.classList.add(v==="ko"?"ko":"ok"); inp.readOnly=true; r.hidden=false; r.className="res "+v;
+    let msg=v==="ok"?"Juste !":v==="near"?"Presque : attention aux ä, ö, ü, ß. "+label:"Pas tout à fait. "+label;
+    if(v==="ko"&&k==="noun"){const w=norm(inp.value).split(" ");const good=alts(cur.de).map(norm).find(a=>a.split(" ").slice(1).join(" ")===w.slice(1).join(" "));if(good&&w.length>1)msg="Bon mot, mauvais article. "+label}
+    if(v==="ko"&&id==="w2"){const w=norm(inp.value);if(alts(cur.pp).map(norm).some(a=>a.split(" ").slice(1).join(" ")===w||a.split(" ").slice(1).join(" ")===w.split(" ").slice(1).join(" ")))msg="Bon participe, mais vérifie hat / ist. "+label}
+    r.textContent=msg; score+=v==="ko"?0:1;
+  });
+  $("checkBtn").hidden=true;
+  reveal();
+  const s=score===parts.length?"g2":score>0?"g1":"g0"; $(s).classList.add("sugg");
+}
 function reveal(){if(!cur||revealed)return;revealed=true;$("ans").hidden=false;$("hint").hidden=true;$("show").hidden=true;$("grade").hidden=false;$("speak").hidden=false;if(S.dir==="fr")speak(cur);}
 function grade(g){
   if(!cur||!revealed) return;
@@ -308,6 +381,7 @@ function grade(g){
   else if(g===1){p.lvl=Math.max(1,p.lvl);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
   else {p.lvl=Math.min(5,p.lvl+1);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
   S.p[cur.id]=p; save(); last=cur;
+  ["g0","g1","g2"].forEach(id=>$(id).classList.remove("sugg"));
   if(cram){const c=cram.queue.shift(); if(g===0) cram.queue.splice(Math.min(4,cram.queue.length),0,c); else cram.done++;}
   render();
 }
@@ -363,13 +437,16 @@ function parseCSV(text){
 rebuild();
 $("speak").innerHTML=SPEAKER;
 $("dirFr").onclick=()=>{S.dir="fr";save();keep=true;render()};
-$("dirDe").onclick=()=>{S.dir="de";save();keep=true;render()};
+$("dirDe").onclick=()=>{S.dir="de";S.write=false;save();keep=true;render()};
 $("viewCards").onclick=()=>{S.view="cards";save();keep=true;render()};
 $("viewList").onclick=()=>{S.view="list";save();render()};
 $("maskBtn").onclick=()=>{S.mask=!S.mask;save();render()};
 $("cramBtn").onclick=startCram; $("doneCram").onclick=startCram; $("listCram").onclick=startCram;
 $("cramStop").onclick=()=>{cram=null;render()};
-$("show").onclick=reveal; $("card").onclick=e=>{if(!e.target.closest(".speak"))reveal()};
+$("show").onclick=reveal; $("card").onclick=e=>{if(e.target.closest(".speak,.exspeak,form")||writing())return;reveal()};
+$("writeForm").onsubmit=e=>{e.preventDefault();if(revealed){return}check()};
+$("modeOral").onclick=()=>{S.write=false;save();keep=true;render()};
+$("modeWrite").onclick=()=>{S.write=true;if(S.dir!=="fr")S.dir="fr";save();keep=true;render()};
 $("speak").onclick=()=>speak(cur);
 $("exSpeak").onclick=e=>{e.stopPropagation();if(cur)say(cur.ex)};
 $("g0").onclick=()=>grade(0);$("g1").onclick=()=>grade(1);$("g2").onclick=()=>grade(2);
