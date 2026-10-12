@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Deutsch Karten</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Deutsch">
+<meta name="theme-color" content="#1f5f8b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+/* Layout: one-column study screen, card in the middle, theme chips above, three grading buttons below */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --ink:#18202b; --muted:#5b6675; --line:#d5dbe3;
+  --accent:#1f5f8b; --accent-ink:#ffffff; --again:#b8432f; --hard:#a26b0c; --good:#2e7d4f;
+  --display:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12171e; --surface:#1b222c; --ink:#e8edf3; --muted:#9aa6b5; --line:#2c3644;
+  --accent:#6fb0de; --accent-ink:#0d1620; --again:#e57a65; --hard:#e0aa4a; --good:#6cc492; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171e; --surface:#1b222c; --ink:#e8edf3; --muted:#9aa6b5; --line:#2c3644;
+  --accent:#6fb0de; --accent-ink:#0d1620; --again:#e57a65; --hard:#e0aa4a; --good:#6cc492; color-scheme:dark}
+html,body{height:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:14px 24px;display:flex;flex-direction:column;gap:14px;min-height:100%;box-sizing:border-box}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:1.6rem;margin:0;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.stats{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:.88rem;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;font-size:.88rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.card{flex:1;min-height:260px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;position:relative;box-shadow:0 1px 0 var(--line)}
+.meta{display:flex;justify-content:space-between;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.face{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0}
+.q{font-family:var(--display);font-weight:600;font-size:clamp(1.4rem,6vw,1.9rem);line-height:1.2;text-wrap:balance;overflow-wrap:anywhere}
+.a{font-family:var(--display);font-weight:600;font-size:clamp(1.25rem,5.4vw,1.7rem);line-height:1.25;color:var(--accent);text-wrap:balance;overflow-wrap:anywhere;border-top:1px dashed var(--line);padding-top:12px}
+.hint{color:var(--muted);font-size:.9rem}
+.speak{position:absolute;right:14px;bottom:14px;border:1px solid var(--line);background:var(--bg);border-radius:50%;width:44px;height:44px;display:grid;place-items:center}
+.speak svg{width:20px;height:20px;fill:currentColor}
+.show{width:100%;border:0;border-radius:14px;padding:15px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:1.05rem}
+.grade{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grade button{border:0;border-radius:14px;padding:13px 6px;font-weight:600;color:#fff;display:flex;flex-direction:column;align-items:center;gap:2px}
+.grade small{font-weight:400;opacity:.85;font-size:.75rem}
+.g0{background:var(--again)} .g1{background:var(--hard)} .g2{background:var(--good)}
+:root:not([data-theme="light"]) .grade button{color:var(--accent-ink)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .grade button{color:#fff}}
+:root[data-theme="light"] .grade button{color:#fff}
+.done{text-align:center;color:var(--muted)}
+.done strong{display:block;font-family:var(--display);font-size:1.5rem;color:var(--ink);margin-bottom:6px}
+.foot{font-size:.8rem;color:var(--muted);text-align:center}
+.linkbtn{background:none;border:0;color:var(--accent);text-decoration:underline;padding:0;font-size:inherit}
+@media (prefers-reduced-motion:no-preference){.a{animation:in .18s ease-out}@keyframes in{from{opacity:.2;transform:translateY(4px)}}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.panel h2{font-family:var(--display);font-size:1.15rem;margin:0}
+.panel p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.field input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:11px 14px;font-weight:600}
+.btn.ghost{background:none;color:var(--accent)}
+.msg{font-size:.9rem;color:var(--good)}
+.mine{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;max-height:260px;overflow-y:auto}
+.mine li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:.92rem}
+.mine li span{min-width:0;overflow-wrap:anywhere}
+.mine li b{color:var(--accent);font-weight:600}
+.mine button{border:0;background:none;color:var(--again);font-size:.85rem;flex:none}
+</style>
+</head><body>
+
+<div class="wrap">
+  <header>
+    <h1>Deutsch <span>Karten</span></h1>
+    <div class="stats" id="stats"></div>
+  </header>
+  <div class="bar" id="bar" aria-hidden="true"></div>
+  <div class="chips" id="chips" role="group" aria-label="Thèmes"></div>
+  <div class="row">
+    <div class="seg" role="group" aria-label="Sens">
+      <button id="dirFr" aria-pressed="true">Parler · FR → DE</button>
+      <button id="dirDe" aria-pressed="false">Comprendre · DE → FR</button>
+    </div>
+  </div>
+
+  <section class="card" id="card" aria-live="polite">
+    <div class="meta"><span id="theme"></span><span id="box"></span></div>
+    <div class="face">
+      <div class="q" id="q"></div>
+      <div class="a" id="a" hidden></div>
+      <div class="hint" id="hint">Dis la réponse à voix haute, puis retourne la carte.</div>
+    </div>
+    <button class="speak" id="speak" aria-label="Écouter en allemand" title="Écouter en allemand">
+      <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+    </button>
+  </section>
+  <div class="done" id="done" hidden><strong>Bravo, c'est fini pour aujourd'hui !</strong>Reviens demain pour les prochaines cartes, ou <button class="linkbtn" id="more">continue avec des cartes en avance</button>.</div>
+
+  <button class="show" id="show">Voir la réponse</button>
+  <div class="grade" id="grade" hidden>
+    <button class="g0" id="g0">À revoir<small>tout à l'heure</small></button>
+    <button class="g1" id="g1">Difficile<small id="g1d"></small></button>
+    <button class="g2" id="g2">Je sais<small id="g2d"></small></button>
+  </div>
+  <section class="panel" id="panel" hidden>
+    <h2>Mes cartes</h2>
+    <form id="addForm" class="row" style="flex-direction:column">
+      <label class="field" for="inFr">Français<input id="inFr" autocomplete="off" required></label>
+      <label class="field" for="inDe">Allemand<input id="inDe" autocomplete="off" lang="de" required></label>
+      <label class="field" for="inTh">Thème (facultatif)<input id="inTh" autocomplete="off" placeholder="Mes cartes" list="themeList"></label>
+      <datalist id="themeList"></datalist>
+      <button class="btn" type="submit">Ajouter la carte</button>
+    </form>
+    <p>Importer un fichier CSV : colonne 1 = français, colonne 2 = allemand, colonne 3 = thème (facultatif). Virgule, point-virgule ou tabulation.</p>
+    <label class="btn ghost" for="csv" style="text-align:center">Importer un CSV<input type="file" id="csv" accept=".csv,.txt,.tsv,text/csv,text/plain" hidden></label>
+    <div class="msg" id="msg" aria-live="polite"></div>
+    <ul class="mine" id="mine"></ul>
+  </section>
+  <div class="foot"><button class="linkbtn" id="toggle">Mes cartes</button> · <span id="total"></span> · <button class="linkbtn" id="reset">Remettre à zéro</button><span id="confirm" hidden> Sûr ? <button class="linkbtn" id="yes">Oui, effacer</button></span></div>
+</div>
+
+<script>
+const BASE = [["Bases", "Bonjour", "Guten Tag / Hallo"], ["Bases", "Bonjour (le matin)", "Guten Morgen"], ["Bases", "Bonsoir", "Guten Abend"], ["Bases", "Salut (sud de l'Allemagne, Autriche)", "Servus / Grüß Gott"], ["Bases", "Au revoir", "Auf Wiedersehen / Tschüss"], ["Bases", "À plus tard", "Bis später"], ["Bases", "À demain", "Bis morgen"], ["Bases", "Bonne journée !", "Schönen Tag noch!"], ["Bases", "Bon week-end !", "Schönes Wochenende!"], ["Bases", "S'il te plaît / S'il vous plaît", "Bitte"], ["Bases", "Merci (beaucoup)", "Danke (schön) / Vielen Dank"], ["Bases", "De rien", "Gern geschehen / Bitte schön"], ["Bases", "Excusez-moi (pour attirer l'attention)", "Entschuldigung"], ["Bases", "Désolé(e)", "Es tut mir leid"], ["Bases", "Pas de problème", "Kein Problem"], ["Bases", "Oui / Non", "Ja / Nein"], ["Bases", "Peut-être", "Vielleicht"], ["Bases", "D'accord", "Einverstanden / Alles klar"], ["Bases", "Volontiers / Avec plaisir", "Gerne"], ["Bases", "Bien sûr", "Natürlich / Klar"], ["Conversation", "Comment ça va ?", "Wie geht's?"], ["Conversation", "Comment allez-vous ?", "Wie geht es Ihnen?"], ["Conversation", "Ça va bien, merci. Et toi ?", "Gut, danke. Und dir?"], ["Conversation", "Ça va, comme ci comme ça", "Es geht so"], ["Conversation", "Comment tu t'appelles ?", "Wie heißt du?"], ["Conversation", "Je m'appelle Luca", "Ich heiße Luca"], ["Conversation", "Enchanté(e)", "Freut mich"], ["Conversation", "D'où viens-tu ?", "Woher kommst du?"], ["Conversation", "Je viens de France", "Ich komme aus Frankreich"], ["Conversation", "J'habite à ...", "Ich wohne in ..."], ["Conversation", "Je parle un peu allemand", "Ich spreche ein bisschen Deutsch"], ["Conversation", "J'apprends l'allemand", "Ich lerne Deutsch"], ["Conversation", "Qu'est-ce que tu fais dans la vie ?", "Was machst du beruflich?"], ["Conversation", "Je travaille comme ...", "Ich arbeite als ..."], ["Conversation", "Qu'est-ce que tu as fait ce week-end ?", "Was hast du am Wochenende gemacht?"], ["Conversation", "J'ai le temps", "Ich habe Zeit"], ["Conversation", "Je n'ai pas le temps", "Ich habe keine Zeit"], ["Conversation", "Ça me plaît", "Das gefällt mir"], ["Conversation", "J'aime bien ça", "Das mag ich"], ["Conversation", "Je ne sais pas", "Ich weiß nicht"], ["Conversation", "Je pense que oui", "Ich glaube schon"], ["Conversation", "C'est vrai ?", "Wirklich?"], ["Conversation", "C'est super !", "Das ist super! / Toll!"], ["Conversation", "Dommage !", "Schade!"], ["Conversation", "Bonne idée !", "Gute Idee!"], ["Conversation", "Aucune idée", "Keine Ahnung"], ["Conversation", "Ça dépend", "Das kommt darauf an"], ["Conversation", "Exactement", "Genau"], ["Conversation", "Moi aussi", "Ich auch"], ["Conversation", "Moi non plus", "Ich auch nicht"], ["Comprendre", "Je ne comprends pas", "Ich verstehe das nicht"], ["Comprendre", "Pouvez-vous répéter, s'il vous plaît ?", "Können Sie das bitte wiederholen?"], ["Comprendre", "Plus lentement, s'il vous plaît", "Langsamer, bitte"], ["Comprendre", "Que veut dire ... ?", "Was bedeutet ...?"], ["Comprendre", "Comment dit-on ... en allemand ?", "Wie sagt man ... auf Deutsch?"], ["Comprendre", "Vous parlez anglais / français ?", "Sprechen Sie Englisch / Französisch?"], ["Comprendre", "Comment ça s'écrit ?", "Wie schreibt man das?"], ["Comprendre", "Tu peux m'aider ?", "Kannst du mir helfen?"], ["Comprendre", "J'ai une question", "Ich habe eine Frage"], ["Comprendre", "Je suis désolé, mon allemand n'est pas très bon", "Tut mir leid, mein Deutsch ist nicht so gut"], ["Questions", "Qui ?", "Wer?"], ["Questions", "Quoi ?", "Was?"], ["Questions", "Où ?", "Wo?"], ["Questions", "Où vas-tu ? (vers où)", "Wohin gehst du?"], ["Questions", "Quand ?", "Wann?"], ["Questions", "Pourquoi ?", "Warum?"], ["Questions", "Comment ?", "Wie?"], ["Questions", "Combien ? (prix)", "Wie viel?"], ["Questions", "Combien ? (nombre)", "Wie viele?"], ["Questions", "Quel / Quelle ?", "Welcher / Welche / Welches?"], ["Questions", "Quelle heure est-il ?", "Wie spät ist es?"], ["Questions", "Où sont les toilettes ?", "Wo ist die Toilette?"], ["Questions", "Combien ça coûte ?", "Was kostet das?"], ["Questions", "Est-ce que c'est possible ?", "Ist das möglich?"], ["Questions", "Qu'est-ce qui se passe ?", "Was ist los?"], ["Quotidien", "Je voudrais un café, s'il vous plaît", "Ich hätte gern einen Kaffee, bitte"], ["Quotidien", "L'addition, s'il vous plaît", "Die Rechnung, bitte / Zahlen, bitte"], ["Quotidien", "Je peux payer par carte ?", "Kann ich mit Karte zahlen?"], ["Quotidien", "C'est pour emporter", "Zum Mitnehmen, bitte"], ["Quotidien", "Pour manger sur place", "Für hier, bitte"], ["Quotidien", "Gardez la monnaie", "Stimmt so"], ["Quotidien", "Bon appétit !", "Guten Appetit!"], ["Quotidien", "Santé !", "Prost!"], ["Quotidien", "Je suis végétarien(ne)", "Ich bin Vegetarier(in)"], ["Quotidien", "Une table pour deux, s'il vous plaît", "Einen Tisch für zwei, bitte"], ["Quotidien", "Où est la gare ?", "Wo ist der Bahnhof?"], ["Quotidien", "Un billet pour ..., s'il vous plaît", "Eine Fahrkarte nach ..., bitte"], ["Quotidien", "Le train a du retard", "Der Zug hat Verspätung"], ["Quotidien", "À gauche / À droite", "Links / Rechts"], ["Quotidien", "Tout droit", "Geradeaus"], ["Quotidien", "C'est loin ?", "Ist es weit?"], ["Quotidien", "Je suis perdu(e)", "Ich habe mich verlaufen"], ["Quotidien", "Je me sens mal", "Mir geht es nicht gut"], ["Quotidien", "J'ai besoin d'un médecin", "Ich brauche einen Arzt"], ["Quotidien", "Au secours !", "Hilfe!"], ["Temps", "Aujourd'hui", "heute"], ["Temps", "Demain", "morgen"], ["Temps", "Hier", "gestern"], ["Temps", "Maintenant", "jetzt"], ["Temps", "Tout de suite", "sofort"], ["Temps", "Plus tard", "später"], ["Temps", "Bientôt", "bald"], ["Temps", "Toujours", "immer"], ["Temps", "Souvent", "oft"], ["Temps", "Parfois", "manchmal"], ["Temps", "Jamais", "nie"], ["Temps", "Le matin", "am Morgen / morgens"], ["Temps", "L'après-midi", "am Nachmittag / nachmittags"], ["Temps", "Le soir", "am Abend / abends"], ["Temps", "Cette semaine", "diese Woche"], ["Temps", "La semaine prochaine", "nächste Woche"], ["Temps", "La semaine dernière", "letzte Woche"], ["Temps", "Lundi, mardi, mercredi", "Montag, Dienstag, Mittwoch"], ["Temps", "Jeudi, vendredi, samedi, dimanche", "Donnerstag, Freitag, Samstag, Sonntag"], ["Temps", "À quelle heure ?", "Um wie viel Uhr?"], ["Temps", "À 9 heures", "Um neun Uhr"], ["Temps", "Il est huit heures et demie", "Es ist halb neun"], ["Verbes", "être", "sein (ich bin, du bist, er ist)"], ["Verbes", "avoir", "haben (ich habe, du hast, er hat)"], ["Verbes", "faire", "machen"], ["Verbes", "aller (à pied)", "gehen"], ["Verbes", "aller (en véhicule) / rouler", "fahren"], ["Verbes", "venir", "kommen"], ["Verbes", "pouvoir", "können"], ["Verbes", "devoir", "müssen"], ["Verbes", "vouloir", "wollen"], ["Verbes", "je voudrais", "ich möchte"], ["Verbes", "savoir", "wissen"], ["Verbes", "dire", "sagen"], ["Verbes", "parler", "sprechen"], ["Verbes", "demander", "fragen"], ["Verbes", "répondre", "antworten"], ["Verbes", "donner", "geben"], ["Verbes", "prendre", "nehmen"], ["Verbes", "voir", "sehen"], ["Verbes", "trouver", "finden"], ["Verbes", "chercher", "suchen"], ["Verbes", "attendre", "warten"], ["Verbes", "travailler", "arbeiten"], ["Verbes", "commencer", "anfangen / beginnen"], ["Verbes", "finir", "beenden / fertig sein"], ["Verbes", "envoyer", "schicken / senden"], ["Verbes", "appeler (téléphoner)", "anrufen"], ["Verbes", "écrire", "schreiben"], ["Verbes", "lire", "lesen"], ["Verbes", "comprendre", "verstehen"], ["Verbes", "oublier", "vergessen"], ["Travail", "le travail", "die Arbeit"], ["Travail", "le bureau", "das Büro"], ["Travail", "l'entreprise", "die Firma / das Unternehmen"], ["Travail", "le / la collègue", "der Kollege / die Kollegin"], ["Travail", "le / la chef", "der Chef / die Chefin"], ["Travail", "le client / la cliente", "der Kunde / die Kundin"], ["Travail", "l'équipe", "das Team"], ["Travail", "la réunion", "das Meeting / die Besprechung"], ["Travail", "le rendez-vous", "der Termin"], ["Travail", "le projet", "das Projekt"], ["Travail", "la tâche", "die Aufgabe"], ["Travail", "le délai, la date limite", "die Frist / die Deadline"], ["Travail", "le contrat", "der Vertrag"], ["Travail", "le salaire", "das Gehalt"], ["Travail", "la facture", "die Rechnung"], ["Travail", "le devis, l'offre", "das Angebot"], ["Travail", "la commande", "die Bestellung"], ["Travail", "le document", "das Dokument / die Unterlage"], ["Travail", "la pièce jointe", "der Anhang"], ["Travail", "l'ordinateur", "der Computer / der Rechner"], ["Travail", "l'imprimante", "der Drucker"], ["Travail", "le mot de passe", "das Passwort"], ["Travail", "les congés, les vacances", "der Urlaub"], ["Travail", "être en arrêt maladie", "krankgeschrieben sein"], ["Travail", "les heures supplémentaires", "die Überstunden"], ["Travail", "le télétravail", "das Homeoffice"], ["Travail", "la pause", "die Pause"], ["Travail", "la pause de midi", "die Mittagspause"], ["Travail", "l'entretien d'embauche", "das Vorstellungsgespräch"], ["Travail", "la candidature", "die Bewerbung"], ["Travail (phrases)", "Je travaille chez ...", "Ich arbeite bei ..."], ["Travail (phrases)", "Je suis responsable de ...", "Ich bin für ... zuständig"], ["Travail (phrases)", "J'ai une réunion à 10 heures", "Ich habe um zehn Uhr ein Meeting"], ["Travail (phrases)", "On peut fixer un rendez-vous ?", "Können wir einen Termin vereinbaren?"], ["Travail (phrases)", "Est-ce que mardi vous convient ?", "Passt Ihnen Dienstag?"], ["Travail (phrases)", "Ça me convient", "Das passt mir"], ["Travail (phrases)", "Je dois décaler le rendez-vous", "Ich muss den Termin verschieben"], ["Travail (phrases)", "Je suis en retard, désolé", "Entschuldigung, ich bin spät dran"], ["Travail (phrases)", "Je m'en occupe", "Ich kümmere mich darum"], ["Travail (phrases)", "C'est fait", "Das ist erledigt"], ["Travail (phrases)", "Je vous envoie le document par e-mail", "Ich schicke Ihnen das Dokument per E-Mail"], ["Travail (phrases)", "Je reviens vers vous", "Ich melde mich bei Ihnen"], ["Travail (phrases)", "Quelle est la date limite ?", "Bis wann muss das fertig sein?"], ["Travail (phrases)", "C'est urgent", "Das ist dringend"], ["Travail (phrases)", "Pouvez-vous m'expliquer ?", "Können Sie mir das erklären?"], ["Travail (phrases)", "Je suis d'accord", "Ich bin einverstanden / Ich stimme zu"], ["Travail (phrases)", "Je ne suis pas d'accord", "Ich bin nicht einverstanden"], ["Travail (phrases)", "Bonne question !", "Gute Frage!"], ["Travail (phrases)", "Qu'en pensez-vous ?", "Was meinen Sie?"], ["Travail (phrases)", "À mon avis ...", "Meiner Meinung nach ..."], ["Travail (phrases)", "On en parle plus tard ?", "Sprechen wir später darüber?"], ["Travail (phrases)", "Je suis occupé(e) en ce moment", "Ich bin gerade beschäftigt"], ["Travail (phrases)", "Tu as cinq minutes ?", "Hast du kurz Zeit?"], ["Travail (phrases)", "Je suis en télétravail aujourd'hui", "Ich bin heute im Homeoffice"], ["Travail (phrases)", "Je suis malade aujourd'hui", "Ich bin heute krank"], ["Travail (phrases)", "Je prends ma pause", "Ich mache Pause"], ["Travail (phrases)", "Bon courage / Bon travail !", "Viel Erfolg! / Frohes Schaffen!"], ["Travail (phrases)", "Merci pour votre aide", "Danke für Ihre Hilfe"], ["E-mail & téléphone", "Madame, ... (début d'e-mail)", "Sehr geehrte Frau ...,"], ["E-mail & téléphone", "Monsieur, ... (début d'e-mail)", "Sehr geehrter Herr ...,"], ["E-mail & téléphone", "Bonjour Anna, (e-mail moins formel)", "Hallo Anna, / Liebe Anna,"], ["E-mail & téléphone", "Cordialement", "Mit freundlichen Grüßen"], ["E-mail & téléphone", "Bien à vous (plus amical)", "Viele Grüße / Beste Grüße"], ["E-mail & téléphone", "Merci pour votre e-mail", "Vielen Dank für Ihre E-Mail"], ["E-mail & téléphone", "Vous trouverez ci-joint ...", "Im Anhang finden Sie ..."], ["E-mail & téléphone", "Dans l'attente de votre réponse", "Ich freue mich auf Ihre Antwort"], ["E-mail & téléphone", "N'hésitez pas à me contacter si besoin", "Bei Fragen stehe ich gerne zur Verfügung"], ["E-mail & téléphone", "(Au téléphone) Luca Martin à l'appareil", "Hier spricht Luca Martin"], ["E-mail & téléphone", "Pourrais-je parler à ... ?", "Kann ich bitte mit ... sprechen?"], ["E-mail & téléphone", "Ne quittez pas", "Einen Moment, bitte"], ["E-mail & téléphone", "Il / Elle n'est pas là", "Er / Sie ist nicht da"], ["E-mail & téléphone", "Je peux laisser un message ?", "Kann ich eine Nachricht hinterlassen?"], ["E-mail & téléphone", "Je vous rappelle", "Ich rufe Sie zurück"], ["E-mail & téléphone", "Je vous entends mal", "Ich verstehe Sie schlecht"], ["E-mail & téléphone", "Quel est votre numéro ?", "Wie ist Ihre Nummer?"], ["Mots utiles", "et / ou / mais", "und / oder / aber"], ["Mots utiles", "parce que", "weil"], ["Mots utiles", "donc", "also"], ["Mots utiles", "aussi", "auch"], ["Mots utiles", "encore / déjà", "noch / schon"], ["Mots utiles", "très", "sehr"], ["Mots utiles", "beaucoup", "viel"], ["Mots utiles", "un peu", "ein bisschen"], ["Mots utiles", "tout", "alles"], ["Mots utiles", "rien", "nichts"], ["Mots utiles", "quelque chose", "etwas"], ["Mots utiles", "ici / là-bas", "hier / dort"], ["Mots utiles", "bon / mauvais", "gut / schlecht"], ["Mots utiles", "grand / petit", "groß / klein"], ["Mots utiles", "facile / difficile", "einfach / schwierig"], ["Mots utiles", "important", "wichtig"], ["Mots utiles", "fini, prêt", "fertig"], ["Mots utiles", "libre / occupé", "frei / besetzt"], ["Mots utiles", "ouvert / fermé", "geöffnet / geschlossen"], ["Mots utiles", "cher / bon marché", "teuer / billig"]].map(c=>({id:c[1]+"|"+c[2],theme:c[0],fr:c[1],de:c[2]}));
+let CARDS = BASE;
+const DAY=86400000, INTERVALS=[0,1,3,7,16,35]; // jours par niveau 0..5
+const KEY="deutsch-karten-v1";
+let S={p:{},theme:"Tout",dir:"fr",custom:[]};
+try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+let cur=null, revealed=false, ahead=false, again=[];
+
+function prog(c){return S.p[c.id]||{lvl:0,due:0,seen:false}}
+function pool(){return CARDS.filter(c=>S.theme==="Tout"||c.theme===S.theme)}
+function nextCard(){
+  const now=Date.now(), P=pool();
+  const due=P.filter(c=>prog(c).seen&&prog(c).due<=now).sort((a,b)=>prog(a).due-prog(b).due);
+  if(due.length) return due[0];
+  const fresh=P.filter(c=>!prog(c).seen);
+  const newToday=Object.values(S.p).filter(p=>p.first&&now-p.first<DAY).length;
+  if(fresh.length&&(newToday<20||ahead)) return fresh[0];
+  if(ahead){const f=P.filter(c=>prog(c).seen).sort((a,b)=>prog(a).due-prog(b).due);return f[0]||null}
+  return null;
+}
+function label(d){return d<=0?"tout à l'heure":d===1?"demain":"dans "+d+" j"}
+function render(){
+  document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===S.theme));
+  $("dirFr").setAttribute("aria-pressed",S.dir==="fr"); $("dirDe").setAttribute("aria-pressed",S.dir==="de");
+  const P=pool(), now=Date.now();
+  const counts=[0,0,0,0,0,0]; let nNew=0, nDue=0;
+  P.forEach(c=>{const p=prog(c); if(!p.seen) nNew++; else {counts[p.lvl]++; if(p.due<=now) nDue++;}});
+  $("stats").textContent=nDue+" à réviser · "+nNew+" nouvelles";
+  const seen=P.length-nNew, known=counts[3]+counts[4]+counts[5];
+  $("bar").innerHTML=`<i style="width:${known/P.length*100}%;background:var(--good)"></i><i style="width:${(seen-known)/P.length*100}%;background:var(--hard)"></i>`;
+  $("total").textContent=known+" / "+P.length+" cartes bien sues";
+  cur=nextCard(); revealed=false;
+  const has=!!cur;
+  $("card").hidden=!has; $("show").hidden=!has; $("grade").hidden=true; $("done").hidden=has;
+  if(!has) return;
+  const p=prog(cur);
+  $("theme").textContent=cur.theme;
+  $("box").textContent=p.seen?"Niveau "+p.lvl:"Nouvelle";
+  $("q").textContent=S.dir==="fr"?cur.fr:cur.de;
+  $("q").lang=S.dir==="fr"?"fr":"de";
+  $("a").textContent=S.dir==="fr"?cur.de:cur.fr;
+  $("a").lang=S.dir==="fr"?"de":"fr";
+  $("a").hidden=true; $("hint").hidden=false;
+  $("hint").textContent=S.dir==="fr"?"Dis la phrase en allemand à voix haute, puis retourne la carte.":"Écoute, essaie de comprendre, puis retourne la carte.";
+  $("speak").hidden=S.dir==="fr";
+  const l1=Math.max(1,p.lvl), l2=Math.min(5,p.lvl+1);
+  $("g1d").textContent=label(INTERVALS[l1]); $("g2d").textContent=label(INTERVALS[l2]);
+}
+function reveal(){if(!cur||revealed)return;revealed=true;$("a").hidden=false;$("hint").hidden=true;$("show").hidden=true;$("grade").hidden=false;$("speak").hidden=false;if(S.dir==="fr")speak();}
+function grade(g){
+  if(!cur||!revealed) return;
+  const p=prog(cur), now=Date.now();
+  if(!p.seen){p.seen=true;p.first=now}
+  if(g===0){p.lvl=0;p.due=now+60000}
+  else if(g===1){p.lvl=Math.max(1,p.lvl);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
+  else {p.lvl=Math.min(5,p.lvl+1);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
+  S.p[cur.id]=p; save(); render();
+}
+let voice=null;
+function pickVoice(){const v=speechSynthesis.getVoices().filter(v=>v.lang&&v.lang.toLowerCase().startsWith("de"));voice=v.find(x=>/Anna|Helena|Petra|Markus/.test(x.name))||v[0]||null}
+function speak(){
+  if(!cur||!("speechSynthesis" in window))return;
+  const txt=cur.de.split(" / ")[0].replace(/\(.*?\)/g,"").replace(/\.\.\./g,"");
+  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang="de-DE"; u.rate=.9; if(voice)u.voice=voice; speechSynthesis.speak(u);
+}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+
+function rebuild(){
+  CARDS=S.custom.map(c=>({id:"m|"+c.fr+"|"+c.de,theme:c.theme||"Mes cartes",fr:c.fr,de:c.de})).concat(BASE);
+  const themes=["Tout",...new Set(CARDS.map(c=>c.theme))];
+  if(!themes.includes(S.theme)) S.theme="Tout";
+  $("chips").innerHTML="";
+  themes.forEach(t=>{const b=document.createElement("button");b.className="chip";b.textContent=t;b.dataset.t=t;b.onclick=()=>{S.theme=t;ahead=false;save();render()};$("chips").appendChild(b)});
+  $("themeList").innerHTML=themes.slice(1).map(t=>`<option value="${t.replace(/"/g,"&quot;")}">`).join("");
+  const ul=$("mine"); ul.innerHTML="";
+  S.custom.forEach((c,i)=>{const li=document.createElement("li");li.innerHTML="<span></span><button>Supprimer</button>";li.firstChild.textContent=c.fr+" → ";const b=document.createElement("b");b.textContent=c.de;li.firstChild.appendChild(b);li.lastChild.onclick=()=>{S.custom.splice(i,1);save();rebuild();render()};ul.appendChild(li)});
+}
+function addCards(list){
+  const have=new Set(CARDS.map(c=>c.fr+"|"+c.de)); let n=0;
+  list.forEach(c=>{const fr=(c.fr||"").trim(),de=(c.de||"").trim();if(!fr||!de||have.has(fr+"|"+de))return;have.add(fr+"|"+de);S.custom.unshift({fr,de,theme:(c.theme||"").trim()||"Mes cartes"});n++});
+  save();rebuild();render();return n;
+}
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,"");
+  const first=text.split(/\r?\n/)[0]||"";
+  const sep=first.includes("\t")?"\t":(first.split(";").length>first.split(",").length?";":",");
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){const ch=text[i];
+    if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}
+    else if(ch==='"')q=true;
+    else if(ch===sep){row.push(f);f=""}
+    else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&text[i+1]==="\n")i++;row.push(f);rows.push(row);row=[];f=""}
+    else f+=ch}
+  if(f||row.length){row.push(f);rows.push(row)}
+  let r=rows.filter(x=>x.length>=2&&x[0].trim()&&x[1].trim());
+  if(r.length&&/^(fr|français|francais|recto|front)$/i.test(r[0][0].trim()))r=r.slice(1);
+  return r.map(x=>({fr:x[0],de:x[1],theme:x[2]}));
+}
+rebuild();
+$("toggle").onclick=()=>{$("panel").hidden=!$("panel").hidden;if(!$("panel").hidden)$("panel").scrollIntoView({behavior:"smooth"})};
+$("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").value,de:$("inDe").value,theme:$("inTh").value}]);$("msg").textContent=n?"Carte ajoutée.":"Cette carte existe déjà.";$("inFr").value="";$("inDe").value="";$("inFr").focus()};
+$("csv").onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const n=addCards(parseCSV(String(rd.result)));$("msg").textContent=n+" carte"+(n>1?"s":"")+" importée"+(n>1?"s":"")+".";e.target.value=""};rd.readAsText(file,"utf-8")};
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+$("dirFr").onclick=()=>{S.dir="fr";save();render()};
+$("dirDe").onclick=()=>{S.dir="de";save();render()};
+$("show").onclick=reveal; $("card").onclick=e=>{if(!e.target.closest(".speak"))reveal()};
+$("speak").onclick=speak;
+$("g0").onclick=()=>grade(0);$("g1").onclick=()=>grade(1);$("g2").onclick=()=>grade(2);
+$("more").onclick=()=>{ahead=true;render()};
+$("reset").onclick=()=>{$("confirm").hidden=false};
+$("yes").onclick=()=>{S.p={};save();$("confirm").hidden=true;render()};
+document.addEventListener("keydown",e=>{if(e.target.closest("input,form"))return;if(e.key===" "){e.preventDefault();reveal()}else if(["1","2","3"].includes(e.key))grade(+e.key-1)});
+render();
+</script>
+</body></html>
