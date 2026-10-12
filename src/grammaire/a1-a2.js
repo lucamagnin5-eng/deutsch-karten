@@ -1,8 +1,9 @@
-// Leçons de grammaire A2. Chaque exercice : q (phrase avec ___), a (réponses acceptées),
+// Leçons de grammaire. Chaque leçon : id, level (A1…C1), title, sub, body (HTML), ex.
+// Leçons A1 et A2. Chaque exercice : q (phrase avec ___), a (réponses acceptées),
 // c (choix proposés, facultatif : sinon l'élève écrit), fr (traduction), why (explication).
 const GRAMMAR = [
 {
-  id: "genre",
+  id: "genre", level: "A1",
   title: "Le genre : der, die, das",
   sub: "Masculin, féminin, neutre et pluriel",
   body: `
@@ -32,7 +33,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "present",
+  id: "present", level: "A1",
   title: "Le présent",
   sub: "Conjuguer les verbes réguliers et irréguliers",
   body: `
@@ -62,7 +63,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "ordre",
+  id: "ordre", level: "A1",
   title: "La place du verbe",
   sub: "Le verbe conjugué en 2e position",
   body: `
@@ -84,7 +85,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "akkusativ",
+  id: "akkusativ", level: "A1",
   title: "L'accusatif",
   sub: "Le complément direct : der → den",
   body: `
@@ -110,7 +111,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "dativ",
+  id: "dativ", level: "A2",
   title: "Le datif",
   sub: "Le complément indirect et les prépositions mit, bei, zu…",
   body: `
@@ -137,7 +138,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "wechsel",
+  id: "wechsel", level: "A2",
   title: "Où ? ou Vers où ?",
   sub: "in, an, auf… + datif ou accusatif",
   body: `
@@ -159,7 +160,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "modaux",
+  id: "modaux", level: "A1",
   title: "Les verbes de modalité",
   sub: "können, müssen, wollen, dürfen, sollen, möchten",
   body: `
@@ -187,7 +188,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "trennbar",
+  id: "trennbar", level: "A1",
   title: "Les verbes à particule",
   sub: "anrufen → Ich rufe dich an",
   body: `
@@ -209,7 +210,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "perfekt",
+  id: "perfekt", level: "A2",
   title: "Le passé composé (Perfekt)",
   sub: "haben ou sein + participe passé",
   body: `
@@ -234,7 +235,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "praeteritum",
+  id: "praeteritum", level: "A2",
   title: "Le passé de sein, haben et des modaux",
   sub: "ich war, ich hatte, ich konnte…",
   body: `
@@ -259,7 +260,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "nebensatz",
+  id: "nebensatz", level: "A2",
   title: "Les subordonnées",
   sub: "weil, dass, wenn, ob : le verbe à la fin",
   body: `
@@ -281,7 +282,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "negation",
+  id: "negation", level: "A1",
   title: "La négation : nicht ou kein",
   sub: "Dire non correctement",
   body: `
@@ -303,7 +304,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "possessifs",
+  id: "possessifs", level: "A1",
   title: "Les possessifs",
   sub: "mein, dein, sein, ihr, unser, Ihr",
   body: `
@@ -328,7 +329,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "comparatif",
+  id: "comparatif", level: "A2",
   title: "Comparer",
   sub: "größer als, so groß wie, am größten",
   body: `
@@ -354,7 +355,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "reflexifs",
+  id: "reflexifs", level: "A2",
   title: "Les verbes réfléchis",
   sub: "sich freuen, sich treffen, sich interessieren für…",
   body: `
@@ -382,7 +383,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "politesse",
+  id: "politesse", level: "A2",
   title: "Demander poliment",
   sub: "Könnten Sie…? Ich hätte gern… Ich würde gern…",
   body: `
@@ -406,7 +407,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "imperatif",
+  id: "imperatif", level: "A1",
   title: "L'impératif",
   sub: "Donner une consigne : Komm! Kommen Sie!",
   body: `

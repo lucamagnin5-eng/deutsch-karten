@@ -116,6 +116,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tabs button{border:0;background:none;padding:10px;font-weight:600;font-size:.95rem}
 .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .section{display:flex;flex-direction:column;gap:14px}
+#gLv{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow:visible}
+#gLv .chip{padding:6px 4px;text-align:center}
+#gLv .chip small{display:block;margin:0}
 .lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .lessons button{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .lessons .lt{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -150,6 +153,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <h1>Deutsch <span>Karten</span></h1>
     <div class="stats" id="stats"></div>
   </header>
+  <button class="btn" id="updBar" hidden><span id="updBtn">Nouvelle version disponible : toucher pour mettre à jour</span></button>
   <div class="tabs" role="group" aria-label="Section"><button id="tabCards" aria-pressed="true">Cartes</button><button id="tabGram" aria-pressed="false">Grammaire</button></div>
   <div class="section" id="cardsSection">
   <div class="bar" id="bar" aria-hidden="true"></div>
@@ -491,7 +495,25 @@ $("toggle").onclick=()=>{$("panel").hidden=!$("panel").hidden;if(!$("panel").hid
 $("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").value,de:$("inDe").value,tags:$("inTags").value,pl:$("inPl").value,pp:$("inPp").value,ex:$("inEx").value,exfr:$("inExFr").value}]);$("msg").textContent=n?"Carte ajoutée.":"Cette carte existe déjà.";["inFr","inDe","inPl","inPp","inEx","inExFr"].forEach(id=>$(id).value="");$("inFr").focus()};
 $("csv").onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const n=addCards(parseCSV(String(rd.result)));$("msg").textContent=n+" carte"+(n>1?"s":"")+" importée"+(n>1?"s":"")+".";e.target.value=""};rd.readAsText(file,"utf-8")};
 document.addEventListener("keydown",e=>{if(e.target.closest("input,form")||S.view!=="cards")return;if(e.key===" "){e.preventDefault();reveal()}else if(["1","2","3"].includes(e.key))grade(+e.key-1)});
-if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+// ---- Mise à jour automatique ----
+const VERSION="__VERSION__";
+let swReg=null;
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>swReg=r).catch(()=>{});
+function busy(){return !!cram||!!gRun||revealed||[...document.querySelectorAll("input")].some(i=>i.type!=="file"&&i.value)}
+async function checkUpdate(){
+  if(location.protocol!=="https:"||!navigator.onLine) return;
+  try{
+    const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"}); if(!r.ok) return;
+    const v=(await r.json()).version; if(!v||v===VERSION) return;
+    if(swReg) await swReg.update().catch(()=>{});
+    if(busy()) $("updBar").hidden=false; else location.reload();
+  }catch(e){}
+}
+$("updBar").onclick=()=>location.reload();
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkUpdate()});
+window.addEventListener("online",checkUpdate);
+setInterval(checkUpdate,30*60*1000);
+checkUpdate();
 // ---- Grammaire ----
 __GRAMMAR__
 S.gram=S.gram||{};
@@ -507,15 +529,21 @@ function blankQ(q,fill){return esc(q).replace("___",`<span class="blank">${fill?
 function renderGram(){
   const el=$("gramSection");
   if(!gL){
-    el.innerHTML=`<p class="gfr" style="margin:0">${GRAMMAR.length} leçons essentielles du niveau A2, chacune avec ses exercices.</p><ul class="lessons">`+GRAMMAR.map((l,i)=>{
+    const LV=["A1","A2","B1","B2","C1"], lv=LV.includes(S.glevel)?S.glevel:"A1";
+    const LVTXT={A1:"Débutant : les bases pour se présenter et parler du quotidien.",A2:"Élémentaire : raconter au passé, relier ses idées, être poli.",B1:"Intermédiaire : s'exprimer avec plus de nuances et de précision.",B2:"Avancé : textes plus complexes, langue écrite et professionnelle.",C1:"Autonome : nuances fines et style soutenu."};
+    const done=l=>S.gram[l.id]!=null;
+    el.innerHTML=`<div class="chips" id="gLv">${LV.map(x=>{const L=GRAMMAR.filter(l=>l.level===x);return `<button class="chip" data-l="${x}" aria-pressed="${x===lv}">${x}<small>${L.filter(done).length}/${L.length}</small></button>`}).join("")}</div>
+      <p class="gfr" style="margin:0">${LVTXT[lv]}</p><ul class="lessons">`+GRAMMAR.map((l,i)=>{
+      if(l.level!==lv) return "";
       const b=S.gram[l.id], full=b!=null&&b===l.ex.length;
       return `<li><button data-i="${i}"><span class="lt"><b>${esc(l.title)}</b><small>${esc(l.sub)}</small></span><span class="score${full?" full":""}">${b==null?"À faire":b+" / "+l.ex.length}</span></button></li>`}).join("")+"</ul>";
     el.querySelectorAll(".lessons button").forEach(b=>b.onclick=()=>{gL=GRAMMAR[+b.dataset.i];gRun=null;renderGram();window.scrollTo(0,0)});
+    el.querySelectorAll("#gLv .chip").forEach(b=>b.onclick=()=>{S.glevel=b.dataset.l;save();renderGram()});
     return;
   }
   if(!gRun){
-    el.innerHTML=`<button class="linkbtn" id="gBack" style="align-self:flex-start">← Toutes les leçons</button>
-      <article class="gpanel"><h2>${esc(gL.title)}</h2>${gL.body}</article>
+    el.innerHTML=`<button class="linkbtn" id="gBack" style="align-self:flex-start">← Leçons ${gL.level}</button>
+      <article class="gpanel"><span class="gfr">Niveau ${gL.level}</span><h2>${esc(gL.title)}</h2>${gL.body}</article>
       <button class="btn" id="gStart">Faire les exercices (${gL.ex.length})</button>`;
     el.querySelectorAll("table").forEach(tb=>{const w=document.createElement("div");w.className="tw";tb.replaceWith(w);w.appendChild(tb)});
     $("gBack").onclick=()=>{gL=null;renderGram()};

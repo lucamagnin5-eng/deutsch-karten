@@ -116,6 +116,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .tabs button{border:0;background:none;padding:10px;font-weight:600;font-size:.95rem}
 .tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .section{display:flex;flex-direction:column;gap:14px}
+#gLv{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow:visible}
+#gLv .chip{padding:6px 4px;text-align:center}
+#gLv .chip small{display:block;margin:0}
 .lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .lessons button{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .lessons .lt{display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -150,6 +153,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <h1>Deutsch <span>Karten</span></h1>
     <div class="stats" id="stats"></div>
   </header>
+  <button class="btn" id="updBar" hidden><span id="updBtn">Nouvelle version disponible : toucher pour mettre à jour</span></button>
   <div class="tabs" role="group" aria-label="Section"><button id="tabCards" aria-pressed="true">Cartes</button><button id="tabGram" aria-pressed="false">Grammaire</button></div>
   <div class="section" id="cardsSection">
   <div class="bar" id="bar" aria-hidden="true"></div>
@@ -491,13 +495,32 @@ $("toggle").onclick=()=>{$("panel").hidden=!$("panel").hidden;if(!$("panel").hid
 $("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").value,de:$("inDe").value,tags:$("inTags").value,pl:$("inPl").value,pp:$("inPp").value,ex:$("inEx").value,exfr:$("inExFr").value}]);$("msg").textContent=n?"Carte ajoutée.":"Cette carte existe déjà.";["inFr","inDe","inPl","inPp","inEx","inExFr"].forEach(id=>$(id).value="");$("inFr").focus()};
 $("csv").onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const n=addCards(parseCSV(String(rd.result)));$("msg").textContent=n+" carte"+(n>1?"s":"")+" importée"+(n>1?"s":"")+".";e.target.value=""};rd.readAsText(file,"utf-8")};
 document.addEventListener("keydown",e=>{if(e.target.closest("input,form")||S.view!=="cards")return;if(e.key===" "){e.preventDefault();reveal()}else if(["1","2","3"].includes(e.key))grade(+e.key-1)});
-if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+// ---- Mise à jour automatique ----
+const VERSION="8998e47cae";
+let swReg=null;
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>swReg=r).catch(()=>{});
+function busy(){return !!cram||!!gRun||revealed||[...document.querySelectorAll("input")].some(i=>i.type!=="file"&&i.value)}
+async function checkUpdate(){
+  if(location.protocol!=="https:"||!navigator.onLine) return;
+  try{
+    const r=await fetch("version.json?t="+Date.now(),{cache:"no-store"}); if(!r.ok) return;
+    const v=(await r.json()).version; if(!v||v===VERSION) return;
+    if(swReg) await swReg.update().catch(()=>{});
+    if(busy()) $("updBar").hidden=false; else location.reload();
+  }catch(e){}
+}
+$("updBar").onclick=()=>location.reload();
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkUpdate()});
+window.addEventListener("online",checkUpdate);
+setInterval(checkUpdate,30*60*1000);
+checkUpdate();
 // ---- Grammaire ----
-// Leçons de grammaire A2. Chaque exercice : q (phrase avec ___), a (réponses acceptées),
+// Leçons de grammaire. Chaque leçon : id, level (A1…C1), title, sub, body (HTML), ex.
+// Leçons A1 et A2. Chaque exercice : q (phrase avec ___), a (réponses acceptées),
 // c (choix proposés, facultatif : sinon l'élève écrit), fr (traduction), why (explication).
 const GRAMMAR = [
 {
-  id: "genre",
+  id: "genre", level: "A1",
   title: "Le genre : der, die, das",
   sub: "Masculin, féminin, neutre et pluriel",
   body: `
@@ -527,7 +550,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "present",
+  id: "present", level: "A1",
   title: "Le présent",
   sub: "Conjuguer les verbes réguliers et irréguliers",
   body: `
@@ -557,7 +580,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "ordre",
+  id: "ordre", level: "A1",
   title: "La place du verbe",
   sub: "Le verbe conjugué en 2e position",
   body: `
@@ -579,7 +602,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "akkusativ",
+  id: "akkusativ", level: "A1",
   title: "L'accusatif",
   sub: "Le complément direct : der → den",
   body: `
@@ -605,7 +628,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "dativ",
+  id: "dativ", level: "A2",
   title: "Le datif",
   sub: "Le complément indirect et les prépositions mit, bei, zu…",
   body: `
@@ -632,7 +655,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "wechsel",
+  id: "wechsel", level: "A2",
   title: "Où ? ou Vers où ?",
   sub: "in, an, auf… + datif ou accusatif",
   body: `
@@ -654,7 +677,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "modaux",
+  id: "modaux", level: "A1",
   title: "Les verbes de modalité",
   sub: "können, müssen, wollen, dürfen, sollen, möchten",
   body: `
@@ -682,7 +705,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "trennbar",
+  id: "trennbar", level: "A1",
   title: "Les verbes à particule",
   sub: "anrufen → Ich rufe dich an",
   body: `
@@ -704,7 +727,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "perfekt",
+  id: "perfekt", level: "A2",
   title: "Le passé composé (Perfekt)",
   sub: "haben ou sein + participe passé",
   body: `
@@ -729,7 +752,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "praeteritum",
+  id: "praeteritum", level: "A2",
   title: "Le passé de sein, haben et des modaux",
   sub: "ich war, ich hatte, ich konnte…",
   body: `
@@ -754,7 +777,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "nebensatz",
+  id: "nebensatz", level: "A2",
   title: "Les subordonnées",
   sub: "weil, dass, wenn, ob : le verbe à la fin",
   body: `
@@ -776,7 +799,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "negation",
+  id: "negation", level: "A1",
   title: "La négation : nicht ou kein",
   sub: "Dire non correctement",
   body: `
@@ -798,7 +821,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "possessifs",
+  id: "possessifs", level: "A1",
   title: "Les possessifs",
   sub: "mein, dein, sein, ihr, unser, Ihr",
   body: `
@@ -823,7 +846,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "comparatif",
+  id: "comparatif", level: "A2",
   title: "Comparer",
   sub: "größer als, so groß wie, am größten",
   body: `
@@ -849,7 +872,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "reflexifs",
+  id: "reflexifs", level: "A2",
   title: "Les verbes réfléchis",
   sub: "sich freuen, sich treffen, sich interessieren für…",
   body: `
@@ -877,7 +900,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "politesse",
+  id: "politesse", level: "A2",
   title: "Demander poliment",
   sub: "Könnten Sie…? Ich hätte gern… Ich würde gern…",
   body: `
@@ -901,7 +924,7 @@ const GRAMMAR = [
   ]
 },
 {
-  id: "imperatif",
+  id: "imperatif", level: "A1",
   title: "L'impératif",
   sub: "Donner une consigne : Komm! Kommen Sie!",
   body: `
@@ -924,6 +947,901 @@ const GRAMMAR = [
 }
 ];
 
+// Leçons A1 et A2 complémentaires.
+GRAMMAR.push(
+{
+  id: "questions", level: "A1",
+  title: "Poser des questions",
+  sub: "W-Fragen et questions oui / non",
+  body: `
+<p><b>Question avec mot interrogatif</b> : mot interrogatif + verbe + sujet.</p>
+<p><i><b>Wo</b> wohnst du? · <b>Was</b> machst du? · <b>Wann</b> kommt der Zug?</i></p>
+<table><tr><th>mot</th><th>sens</th></tr>
+<tr><td>wer / wen / wem</td><td>qui (sujet / COD / à qui)</td></tr>
+<tr><td>was</td><td>quoi, que</td></tr>
+<tr><td>wo / wohin / woher</td><td>où / vers où / d'où</td></tr>
+<tr><td>wann · wie lange · wie oft</td><td>quand · combien de temps · combien de fois</td></tr>
+<tr><td>warum</td><td>pourquoi</td></tr>
+<tr><td>wie · wie viel · wie viele</td><td>comment · combien (quantité) · combien (nombre)</td></tr>
+<tr><td>welcher / welche / welches</td><td>quel / quelle</td></tr></table>
+<p><b>Question oui / non</b> : le verbe commence la phrase. <i><b>Hast</b> du Zeit?</i></p>`,
+  ex: [
+    {q: "___ wohnst du? – In Hamburg.", a: ["Wo"], c: ["Wo", "Wohin", "Woher"], fr: "Où habites-tu ? – À Hambourg.", why: "Lieu sans déplacement → wo."},
+    {q: "___ kommst du? – Aus Frankreich.", a: ["Woher"], c: ["Wo", "Wohin", "Woher"], fr: "D'où viens-tu ? – De France.", why: "Origine → woher."},
+    {q: "___ fährst du am Wochenende? – Nach Wien.", a: ["Wohin"], c: ["Wo", "Wohin", "Woher"], fr: "Où vas-tu ce week-end ? – À Vienne.", why: "Destination → wohin."},
+    {q: "___ Geschwister hast du?", a: ["Wie viele"], c: ["Wie viel", "Wie viele", "Wie lange"], fr: "Combien de frères et sœurs as-tu ?", why: "Nombre (pluriel) → wie viele."},
+    {q: "___ dauert der Kurs? – Zwei Stunden.", a: ["Wie lange"], c: ["Wann", "Wie lange", "Wie oft"], fr: "Combien de temps dure le cours ? – Deux heures.", why: "Durée → wie lange."},
+    {q: "___ Bus fährt zum Bahnhof?", a: ["Welcher"], c: ["Welcher", "Welche", "Welches"], fr: "Quel bus va à la gare ?", why: "der Bus → welcher."},
+    {q: "___ ist das? – Das ist mein Kollege.", a: ["Wer"], c: ["Wer", "Was", "Wen"], fr: "Qui est-ce ? – C'est mon collègue.", why: "Personne, sujet → wer."}
+  ]
+},
+{
+  id: "pluriel", level: "A1",
+  title: "Le pluriel des noms",
+  sub: "-e, -er, -n, -s… et les Umlaut",
+  body: `
+<p>Il n'y a pas une seule règle : apprends le pluriel avec le nom. Mais il y a des tendances fortes.</p>
+<table><tr><th>terminaison</th><th>souvent pour</th><th>exemples</th></tr>
+<tr><td>-n / -en</td><td>la plupart des féminins</td><td>die Frau → Frauen, die Lampe → Lampen</td></tr>
+<tr><td>-nen</td><td>féminins en -in</td><td>die Kollegin → Kolleginnen</td></tr>
+<tr><td>-e (¨)</td><td>beaucoup de masculins</td><td>der Tag → Tage, der Zug → Züge</td></tr>
+<tr><td>-er (¨)</td><td>beaucoup de neutres courts</td><td>das Kind → Kinder, das Buch → Bücher</td></tr>
+<tr><td>– (¨)</td><td>masc./neutres en -er, -el, -en, -chen</td><td>der Lehrer → Lehrer, der Apfel → Äpfel</td></tr>
+<tr><td>-s</td><td>mots étrangers, mots en -a, -o, -i</td><td>das Auto → Autos, das Handy → Handys</td></tr></table>
+<p>Au pluriel l'article est toujours <b>die</b> (et <b>den</b> + -n au datif).</p>`,
+  ex: [
+    {q: "eine Frau, zwei ___", a: ["Frauen"], fr: "une femme, deux femmes", why: "Féminin → -en."},
+    {q: "eine Kollegin, zwei ___", a: ["Kolleginnen"], fr: "une collègue, deux collègues", why: "-in → -innen."},
+    {q: "ein Kind, drei ___", a: ["Kinder"], fr: "un enfant, trois enfants", why: "Neutre court → -er."},
+    {q: "ein Zug, zwei ___", a: ["Züge"], fr: "un train, deux trains", why: "Masculin → -e avec Umlaut."},
+    {q: "ein Auto, zwei ___", a: ["Autos"], fr: "une voiture, deux voitures", why: "Mot en -o → -s."},
+    {q: "ein Lehrer, zwei ___", a: ["Lehrer"], fr: "un professeur, deux professeurs", why: "Masculin en -er → pas de terminaison."},
+    {q: "ein Buch, viele ___", a: ["Bücher"], fr: "un livre, beaucoup de livres", why: "Neutre → -er avec Umlaut."}
+  ]
+},
+{
+  id: "temps", level: "A1",
+  title: "Dire quand : am, um, im…",
+  sub: "Les prépositions de temps",
+  body: `
+<table><tr><th>préposition</th><th>pour</th><th>exemple</th></tr>
+<tr><td><b>um</b></td><td>l'heure</td><td>um 8 Uhr</td></tr>
+<tr><td><b>am</b></td><td>jours, dates, parties du jour</td><td>am Montag, am 3. Mai, am Abend</td></tr>
+<tr><td><b>im</b></td><td>mois, saisons</td><td>im Juli, im Winter</td></tr>
+<tr><td>– (rien)</td><td>années</td><td>2024 (ou: im Jahr 2024)</td></tr>
+<tr><td><b>von … bis</b></td><td>de … à</td><td>von 9 bis 17 Uhr</td></tr>
+<tr><td><b>seit</b> + datif</td><td>depuis (encore vrai)</td><td>seit drei Jahren</td></tr>
+<tr><td><b>vor</b> + datif</td><td>il y a</td><td>vor zwei Tagen</td></tr>
+<tr><td><b>in</b> + datif</td><td>dans (futur)</td><td>in einer Woche</td></tr>
+<tr><td><b>nach / vor</b></td><td>après / avant</td><td>nach der Arbeit, vor dem Essen</td></tr></table>
+<p>Attention : <b>in der Nacht</b> (la nuit), mais <b>am</b> Morgen / Abend.</p>`,
+  ex: [
+    {q: "Das Meeting ist ___ 10 Uhr.", a: ["um"], c: ["um", "am", "im"], fr: "La réunion est à 10 heures.", why: "Heure → um."},
+    {q: "Ich habe ___ Freitag frei.", a: ["am"], c: ["um", "am", "im"], fr: "Je suis libre vendredi.", why: "Jour → am."},
+    {q: "___ August fahren wir in den Urlaub.", a: ["Im"], c: ["Am", "Im", "Um"], fr: "En août nous partons en vacances.", why: "Mois → im."},
+    {q: "Ich wohne ___ zwei Jahren in Berlin.", a: ["seit"], c: ["seit", "vor", "in"], fr: "J'habite à Berlin depuis deux ans.", why: "Toujours vrai aujourd'hui → seit."},
+    {q: "Ich bin ___ drei Tagen angekommen.", a: ["vor"], c: ["seit", "vor", "in"], fr: "Je suis arrivé il y a trois jours.", why: "« il y a » → vor."},
+    {q: "Der Zug kommt ___ zehn Minuten.", a: ["in"], c: ["seit", "vor", "in"], fr: "Le train arrive dans dix minutes.", why: "« dans » (futur) → in."},
+    {q: "Ich arbeite von 9 ___ 17 Uhr.", a: ["bis"], fr: "Je travaille de 9 h à 17 h.", why: "von … bis."}
+  ]
+},
+{
+  id: "pronoms", level: "A2",
+  title: "Les pronoms personnels",
+  sub: "ich, mich, mir…",
+  body: `
+<table><tr><th>nominatif</th><th>accusatif</th><th>datif</th></tr>
+<tr><td>ich</td><td>mich</td><td>mir</td></tr>
+<tr><td>du</td><td>dich</td><td>dir</td></tr>
+<tr><td>er</td><td>ihn</td><td>ihm</td></tr>
+<tr><td>sie</td><td>sie</td><td>ihr</td></tr>
+<tr><td>es</td><td>es</td><td>ihm</td></tr>
+<tr><td>wir</td><td>uns</td><td>uns</td></tr>
+<tr><td>ihr</td><td>euch</td><td>euch</td></tr>
+<tr><td>sie / Sie</td><td>sie / Sie</td><td>ihnen / Ihnen</td></tr></table>
+<p>Le pronom remplace le nom avec son genre : <i>der Computer → <b>er</b> ist kaputt</i> (pas « es » !).</p>
+<p>Avec deux compléments : nom datif avant nom accusatif (<i>Ich gebe <b>dem Chef</b> <b>den Bericht</b></i>), mais pronom accusatif avant pronom datif (<i>Ich gebe <b>ihn ihm</b></i>).</p>`,
+  ex: [
+    {q: "Wo ist der Drucker? – ___ steht im Flur.", a: ["Er"], c: ["Er", "Es", "Sie"], fr: "Où est l'imprimante ? – Elle est dans le couloir.", why: "der Drucker → er."},
+    {q: "Ich rufe ___ morgen an. (toi)", a: ["dich"], c: ["dich", "dir", "du"], fr: "Je t'appelle demain.", why: "anrufen + accusatif → dich."},
+    {q: "Ich helfe ___. (lui)", a: ["ihm"], c: ["ihn", "ihm", "er"], fr: "Je l'aide.", why: "helfen + datif → ihm."},
+    {q: "Kannst du ___ das erklären? (nous)", a: ["uns"], c: ["uns", "euch", "wir"], fr: "Tu peux nous expliquer ça ?", why: "erklären + datif (à qui) → uns."},
+    {q: "Die Wohnung? Ich finde ___ sehr schön.", a: ["sie"], c: ["sie", "ihr", "es"], fr: "L'appartement ? Je le trouve très beau.", why: "die Wohnung, accusatif → sie."},
+    {q: "Das Buch? Ich gebe ___ dir morgen.", a: ["es"], c: ["es", "ihm", "ihn"], fr: "Le livre ? Je te le donne demain.", why: "das Buch → es ; pronom accusatif avant pronom datif."},
+    {q: "Gefällt ___ die Stadt? (vous, poli)", a: ["Ihnen"], c: ["Sie", "Ihnen", "Ihr"], fr: "La ville vous plaît ?", why: "gefallen + datif → Ihnen."}
+  ]
+},
+{
+  id: "adjectifs", level: "A2",
+  title: "La terminaison des adjectifs",
+  sub: "ein guter Kaffee, der gute Kaffee",
+  body: `
+<p>Un adjectif <b>devant</b> un nom prend une terminaison. Après le verbe (Der Kaffee ist gut), il n'en prend pas.</p>
+<p><b>Après der / die / das</b> : presque toujours <b>-e</b> ou <b>-en</b>.</p>
+<table><tr><th></th><th>masc.</th><th>fém.</th><th>neutre</th><th>pluriel</th></tr>
+<tr><td>nom.</td><td>der gut<b>e</b></td><td>die gut<b>e</b></td><td>das gut<b>e</b></td><td>die gut<b>en</b></td></tr>
+<tr><td>acc.</td><td>den gut<b>en</b></td><td>die gut<b>e</b></td><td>das gut<b>e</b></td><td>die gut<b>en</b></td></tr>
+<tr><td>dat.</td><td>dem gut<b>en</b></td><td>der gut<b>en</b></td><td>dem gut<b>en</b></td><td>den gut<b>en</b></td></tr></table>
+<p><b>Après ein / kein / mein</b> : l'adjectif montre le genre quand l'article ne le fait pas.</p>
+<table><tr><th></th><th>masc.</th><th>fém.</th><th>neutre</th><th>pluriel (kein/mein)</th></tr>
+<tr><td>nom.</td><td>ein gut<b>er</b></td><td>eine gut<b>e</b></td><td>ein gut<b>es</b></td><td>meine gut<b>en</b></td></tr>
+<tr><td>acc.</td><td>einen gut<b>en</b></td><td>eine gut<b>e</b></td><td>ein gut<b>es</b></td><td>meine gut<b>en</b></td></tr>
+<tr><td>dat.</td><td>einem gut<b>en</b></td><td>einer gut<b>en</b></td><td>einem gut<b>en</b></td><td>meinen gut<b>en</b></td></tr></table>
+<p><b>Sans article</b> : l'adjectif prend la terminaison de der/die/das (heiß<b>er</b> Kaffee, kalt<b>es</b> Wasser, mit frisch<b>em</b> Brot).</p>`,
+  ex: [
+    {q: "Das ist ein gut___ Restaurant.", a: ["es"], c: ["e", "es", "er"], fr: "C'est un bon restaurant.", why: "ein + neutre nominatif → -es."},
+    {q: "Der neu___ Kollege ist nett.", a: ["e"], c: ["e", "en", "er"], fr: "Le nouveau collègue est sympa.", why: "Après der, nominatif → -e."},
+    {q: "Ich habe einen neu___ Laptop.", a: ["en"], c: ["e", "en", "er"], fr: "J'ai un nouvel ordinateur portable.", why: "Masculin accusatif → -en."},
+    {q: "Sie wohnt in einer klein___ Wohnung.", a: ["en"], c: ["e", "en", "er"], fr: "Elle habite dans un petit appartement.", why: "Datif → toujours -en."},
+    {q: "Ein groß___ Kaffee, bitte!", a: ["er"], c: ["e", "en", "er"], fr: "Un grand café, s'il vous plaît !", why: "ein + masculin nominatif → -er (l'adjectif montre le genre)."},
+    {q: "Ich trinke gern kalt___ Wasser.", a: ["es"], c: ["e", "es", "en"], fr: "J'aime boire de l'eau froide.", why: "Sans article, das Wasser → -es."},
+    {q: "Die alt___ Häuser sind schön.", a: ["en"], c: ["e", "en", "er"], fr: "Les vieilles maisons sont belles.", why: "Pluriel après die → -en."},
+    {q: "Das ist eine gut___ Idee.", a: ["e"], c: ["e", "en", "es"], fr: "C'est une bonne idée.", why: "eine + féminin → -e."}
+  ]
+},
+{
+  id: "futur", level: "A2",
+  title: "Le futur avec werden",
+  sub: "Ich werde … + infinitif",
+  body: `
+<p>En allemand, on utilise souvent le <b>présent</b> pour le futur, avec un mot de temps : <i>Morgen <b>fahre</b> ich nach Berlin.</i></p>
+<p>Le <b>Futur I</b> sert pour les promesses, les prévisions et les suppositions : <b>werden</b> conjugué + <b>infinitif à la fin</b>.</p>
+<table><tr><th></th><th>werden</th></tr>
+<tr><td>ich</td><td>werde</td></tr><tr><td>du</td><td>wirst</td></tr><tr><td>er / sie</td><td>wird</td></tr>
+<tr><td>wir / sie / Sie</td><td>werden</td></tr><tr><td>ihr</td><td>werdet</td></tr></table>
+<p><i>Ich <b>werde</b> dich <b>anrufen</b>.</i> · <i>Es <b>wird</b> morgen <b>regnen</b>.</i> · <i>Er <b>wird</b> wohl krank <b>sein</b>.</i> (supposition)</p>
+<p>werden seul = devenir : <i>Ich <b>werde</b> Lehrer.</i> (je deviens professeur)</p>`,
+  ex: [
+    {q: "Ich ___ dich morgen anrufen.", a: ["werde"], c: ["werde", "wird", "werden"], fr: "Je t'appellerai demain.", why: "ich werde."},
+    {q: "Es ___ morgen regnen.", a: ["wird"], c: ["werde", "wird", "wirst"], fr: "Il pleuvra demain.", why: "es wird."},
+    {q: "___ du nächstes Jahr in Deutschland arbeiten?", a: ["Wirst"], c: ["Wirst", "Wird", "Werdest"], fr: "Travailleras-tu en Allemagne l'an prochain ?", why: "du wirst."},
+    {q: "Wir werden das Projekt im Mai ___. (beenden)", a: ["beenden"], fr: "Nous terminerons le projet en mai.", why: "Infinitif à la fin."},
+    {q: "Er ist nicht da. Er ___ wohl krank sein.", a: ["wird"], c: ["wird", "ist", "hat"], fr: "Il n'est pas là. Il doit être malade.", why: "Supposition → werden + wohl."},
+    {q: "Meine Schwester ___ Ärztin. (devient)", a: ["wird"], c: ["wird", "ist", "werdet"], fr: "Ma sœur devient médecin.", why: "werden seul = devenir."}
+  ]
+},
+{
+  id: "adverbes-liens", level: "A2",
+  title: "Relier deux phrases : deshalb, trotzdem…",
+  sub: "Connecteurs qui prennent la 1re place",
+  body: `
+<p>Trois familles de connecteurs :</p>
+<ul>
+<li><b>und, aber, oder, denn, sondern</b> : ne comptent pas, ordre normal. <i>…, <b>aber</b> ich <b>habe</b> keine Zeit.</i></li>
+<li><b>deshalb, trotzdem, dann, danach, außerdem, sonst</b> : prennent la 1re place, le verbe suit. <i>…, <b>deshalb bleibe</b> ich zu Hause.</i></li>
+<li><b>weil, dass, obwohl, wenn</b>… : verbe à la fin. <i>…, <b>weil</b> ich krank <b>bin</b>.</i></li></ul>
+<table><tr><th>mot</th><th>sens</th></tr>
+<tr><td>deshalb / deswegen</td><td>c'est pourquoi</td></tr>
+<tr><td>trotzdem</td><td>quand même</td></tr>
+<tr><td>außerdem</td><td>en plus</td></tr>
+<tr><td>sonst</td><td>sinon</td></tr>
+<tr><td>sondern</td><td>mais (après une négation)</td></tr></table>`,
+  ex: [
+    {q: "Ich bin krank, deshalb ___ zu Hause.", a: ["bleibe ich"], c: ["ich bleibe", "bleibe ich"], fr: "Je suis malade, c'est pourquoi je reste à la maison.", why: "deshalb prend la 1re place → verbe, puis sujet."},
+    {q: "Es regnet, ___ gehen wir spazieren.", a: ["trotzdem"], c: ["deshalb", "trotzdem", "sonst"], fr: "Il pleut, nous allons quand même nous promener.", why: "Opposition → trotzdem."},
+    {q: "Ich trinke keinen Kaffee, ___ Tee.", a: ["sondern"], c: ["aber", "sondern", "oder"], fr: "Je ne bois pas de café, mais du thé.", why: "Après une négation, « mais » de correction → sondern."},
+    {q: "Beeil dich, ___ verpasst du den Zug!", a: ["sonst"], c: ["sonst", "deshalb", "dann"], fr: "Dépêche-toi, sinon tu vas rater le train !", why: "sinon → sonst."},
+    {q: "Ich habe Hunger, aber ich ___ keine Zeit.", a: ["habe"], c: ["habe", "ich habe"], fr: "J'ai faim, mais je n'ai pas le temps.", why: "aber ne compte pas : ordre normal (ich habe)."},
+    {q: "Die Wohnung ist groß. ___ ist sie billig.", a: ["Außerdem"], c: ["Außerdem", "Sondern", "Denn"], fr: "L'appartement est grand. En plus, il n'est pas cher.", why: "En plus → außerdem (verbe ensuite)."}
+  ]
+}
+);
+
+// Leçons B1.
+GRAMMAR.push(
+{
+  id: "b1-praeteritum", level: "B1",
+  title: "Le prétérit de tous les verbes",
+  sub: "ich machte, ich ging : le passé écrit",
+  body: `
+<p>Le <b>Präteritum</b> est le passé des récits, des journaux et des e-mails formels. À l'oral, on préfère le Perfekt (sauf sein, haben, modaux).</p>
+<p><b>Verbes réguliers</b> : radical + <b>-te</b> + terminaison.</p>
+<table><tr><th></th><th>machen</th><th>arbeiten</th><th>gehen (irrég.)</th></tr>
+<tr><td>ich</td><td>mach<b>te</b></td><td>arbeit<b>ete</b></td><td>ging</td></tr>
+<tr><td>du</td><td>mach<b>test</b></td><td>arbeit<b>etest</b></td><td>ging<b>st</b></td></tr>
+<tr><td>er / sie</td><td>mach<b>te</b></td><td>arbeit<b>ete</b></td><td>ging</td></tr>
+<tr><td>wir / sie</td><td>mach<b>ten</b></td><td>arbeit<b>eten</b></td><td>ging<b>en</b></td></tr>
+<tr><td>ihr</td><td>mach<b>tet</b></td><td>arbeit<b>etet</b></td><td>ging<b>t</b></td></tr></table>
+<p><b>Irréguliers</b> courants : gehen → ging, kommen → kam, sehen → sah, geben → gab, nehmen → nahm, finden → fand, fahren → fuhr, schreiben → schrieb, bleiben → blieb, sprechen → sprach, wissen → wusste, denken → dachte, bringen → brachte.</p>
+<p>ich et er ont toujours la même forme.</p>`,
+  ex: [
+    {q: "Gestern ___ ich lange im Büro. (bleiben)", a: ["blieb"], fr: "Hier je suis resté longtemps au bureau.", why: "bleiben → blieb."},
+    {q: "Er ___ die Tür und ging hinaus. (öffnen)", a: ["öffnete"], fr: "Il ouvrit la porte et sortit.", why: "Régulier en -n : öffn-e-te."},
+    {q: "Wir ___ mit dem Zug nach Paris. (fahren)", a: ["fuhren"], fr: "Nous allâmes à Paris en train.", why: "fahren → fuhr, wir fuhren."},
+    {q: "Sie ___ einen langen Brief. (schreiben)", a: ["schrieb"], fr: "Elle écrivit une longue lettre.", why: "schreiben → schrieb."},
+    {q: "Ich ___ nicht, dass du hier warst. (wissen)", a: ["wusste"], fr: "Je ne savais pas que tu étais ici.", why: "wissen → wusste."},
+    {q: "Plötzlich ___ ein Mann ins Zimmer. (kommen)", a: ["kam"], fr: "Soudain, un homme entra dans la pièce.", why: "kommen → kam."},
+    {q: "Die Firma ___ 2010 mit fünf Mitarbeitern. (beginnen)", a: ["begann"], fr: "L'entreprise a commencé en 2010 avec cinq employés.", why: "beginnen → begann."},
+    {q: "Ich ___ an dich. (denken)", a: ["dachte"], fr: "Je pensais à toi.", why: "denken → dachte (mixte : changement + -te)."}
+  ]
+},
+{
+  id: "b1-plusquamperfekt", level: "B1",
+  title: "Le plus-que-parfait",
+  sub: "ich hatte gemacht, ich war gegangen",
+  body: `
+<p>Le <b>Plusquamperfekt</b> exprime une action <b>antérieure</b> à une autre action passée.</p>
+<p>Formation : <b>hatte / war</b> (prétérit de haben / sein) + <b>participe passé</b>. Même choix haben/sein qu'au Perfekt.</p>
+<p><i>Als ich ankam, <b>war</b> der Zug schon <b>abgefahren</b>.</i> (le train était déjà parti)</p>
+<p><i>Ich <b>hatte</b> die Präsentation gut <b>vorbereitet</b>, deshalb lief alles gut.</i></p>
+<p>Souvent avec <b>nachdem</b> : <i>Nachdem ich gegessen <b>hatte</b>, ging ich spazieren.</i></p>`,
+  ex: [
+    {q: "Als wir ankamen, ___ der Film schon begonnen.", a: ["hatte"], c: ["hatte", "war", "hat"], fr: "Quand nous sommes arrivés, le film avait déjà commencé.", why: "beginnen → haben ; antériorité → hatte."},
+    {q: "Der Zug ___ schon abgefahren.", a: ["war"], c: ["hatte", "war", "ist"], fr: "Le train était déjà parti.", why: "abfahren → sein ; Plusquamperfekt → war."},
+    {q: "Nachdem ich die E-Mail ___ hatte, rief ich den Kunden an. (schreiben)", a: ["geschrieben"], fr: "Après avoir écrit l'e-mail, j'ai appelé le client.", why: "hatte + participe passé."},
+    {q: "Sie war müde, weil sie schlecht ___ hatte. (schlafen)", a: ["geschlafen"], fr: "Elle était fatiguée parce qu'elle avait mal dormi.", why: "schlafen → geschlafen."},
+    {q: "Ich ___ meinen Schlüssel vergessen und konnte nicht rein.", a: ["hatte"], c: ["hatte", "war", "habe"], fr: "J'avais oublié ma clé et je ne pouvais pas entrer.", why: "vergessen → haben."},
+    {q: "Nachdem er in Berlin ___ war, suchte er eine Wohnung. (ankommen)", a: ["angekommen"], fr: "Après être arrivé à Berlin, il chercha un appartement.", why: "ankommen → angekommen (avec sein)."}
+  ]
+},
+{
+  id: "b1-relatives", level: "B1",
+  title: "Les propositions relatives",
+  sub: "der Mann, der… / den… / dem…",
+  body: `
+<p>Le pronom relatif a le <b>genre et le nombre</b> du nom qu'il remplace, et le <b>cas</b> de sa fonction dans la relative. Le verbe va à la fin.</p>
+<table><tr><th></th><th>masc.</th><th>fém.</th><th>neutre</th><th>pluriel</th></tr>
+<tr><td>nom.</td><td>der</td><td>die</td><td>das</td><td>die</td></tr>
+<tr><td>acc.</td><td>den</td><td>die</td><td>das</td><td>die</td></tr>
+<tr><td>dat.</td><td>dem</td><td>der</td><td>dem</td><td><b>denen</b></td></tr>
+<tr><td>gén.</td><td>dessen</td><td>deren</td><td>dessen</td><td>deren</td></tr></table>
+<p><i>Der Kollege, <b>der</b> neben mir sitzt, …</i> (sujet) · <i>Der Kollege, <b>den</b> ich gestern getroffen habe, …</i> (COD) · <i>Der Kollege, <b>dem</b> ich geholfen habe, …</i> (datif)</p>
+<p>Avec préposition : la préposition vient d'abord. <i>Die Firma, <b>bei der</b> ich arbeite, …</i></p>`,
+  ex: [
+    {q: "Das ist der Kollege, ___ mir immer hilft.", a: ["der"], c: ["der", "den", "dem"], fr: "C'est le collègue qui m'aide toujours.", why: "Sujet de hilft, masculin → der."},
+    {q: "Der Film, ___ wir gesehen haben, war super.", a: ["den"], c: ["der", "den", "dem"], fr: "Le film que nous avons vu était super.", why: "COD de gesehen, masculin → den."},
+    {q: "Die Frau, ___ ich das Buch gegeben habe, ist meine Nachbarin.", a: ["der"], c: ["die", "der", "denen"], fr: "La femme à qui j'ai donné le livre est ma voisine.", why: "geben + datif (à qui), féminin → der."},
+    {q: "Die Firma, bei ___ ich arbeite, ist klein.", a: ["der"], c: ["die", "der", "dem"], fr: "L'entreprise pour laquelle je travaille est petite.", why: "bei + datif, féminin → der."},
+    {q: "Das Hotel, ___ wir gebucht haben, liegt am Meer.", a: ["das"], c: ["das", "dem", "den"], fr: "L'hôtel que nous avons réservé est au bord de la mer.", why: "COD, neutre → das."},
+    {q: "Die Kunden, mit ___ ich telefoniert habe, sind zufrieden.", a: ["denen"], c: ["die", "denen", "deren"], fr: "Les clients avec qui j'ai téléphoné sont satisfaits.", why: "mit + datif pluriel → denen."},
+    {q: "Der Mann, ___ Auto vor der Tür steht, ist mein Chef.", a: ["dessen"], c: ["dessen", "deren", "dem"], fr: "L'homme dont la voiture est devant la porte est mon chef.", why: "Possession (dont), masculin → dessen."}
+  ]
+},
+{
+  id: "b1-passif", level: "B1",
+  title: "Le passif",
+  sub: "werden + participe passé",
+  body: `
+<p>Le passif met l'accent sur l'<b>action</b>, pas sur qui la fait. Formation : <b>werden</b> conjugué + <b>participe passé</b> à la fin.</p>
+<table><tr><th>temps</th><th>exemple</th></tr>
+<tr><td>présent</td><td>Das Büro <b>wird</b> jeden Tag <b>geputzt</b>.</td></tr>
+<tr><td>prétérit</td><td>Das Haus <b>wurde</b> 1900 <b>gebaut</b>.</td></tr>
+<tr><td>Perfekt</td><td>Der Vertrag <b>ist</b> <b>unterschrieben worden</b>.</td></tr></table>
+<p>Au Perfekt passif, on écrit <b>worden</b> (pas geworden) et l'auxiliaire est <b>sein</b>.</p>
+<p>Celui qui fait l'action : <b>von</b> + datif (<i>Die E-Mail wurde <b>vom</b> Chef geschrieben</i>).</p>
+<p>Prétérit de werden : ich wurde, du wurdest, er wurde, wir wurden.</p>`,
+  ex: [
+    {q: "Hier ___ Deutsch gesprochen.", a: ["wird"], c: ["wird", "ist", "hat"], fr: "Ici on parle allemand.", why: "Passif présent : wird + participe."},
+    {q: "Das Haus wurde 1950 ___. (bauen)", a: ["gebaut"], fr: "La maison a été construite en 1950.", why: "Participe passé à la fin."},
+    {q: "Die Pakete ___ morgen geliefert.", a: ["werden"], c: ["wird", "werden", "wurden"], fr: "Les colis seront livrés demain.", why: "Sujet pluriel → werden."},
+    {q: "Der Vertrag ist gestern unterschrieben ___.", a: ["worden"], c: ["geworden", "worden", "gewesen"], fr: "Le contrat a été signé hier.", why: "Perfekt passif → worden."},
+    {q: "Die Präsentation wurde ___ Chef gehalten.", a: ["vom"], c: ["vom", "durch", "mit"], fr: "La présentation a été faite par le chef.", why: "L'agent → von + datif (vom)."},
+    {q: "Gestern ___ das Meeting abgesagt.", a: ["wurde"], c: ["wird", "wurde", "ist"], fr: "Hier la réunion a été annulée.", why: "Passé → wurde."},
+    {q: "Die Rechnung muss bis Freitag bezahlt ___.", a: ["werden"], c: ["werden", "worden", "wird"], fr: "La facture doit être payée d'ici vendredi.", why: "Modal + participe + werden (infinitif)."}
+  ]
+},
+{
+  id: "b1-konj2", level: "B1",
+  title: "Le conditionnel (Konjunktiv II)",
+  sub: "Wenn ich Zeit hätte, würde ich…",
+  body: `
+<p>Pour parler de situations <b>imaginaires</b> ou de <b>souhaits</b>.</p>
+<p>Formes à connaître : <b>wäre</b> (sein), <b>hätte</b> (haben), <b>könnte, müsste, dürfte, sollte, wollte</b>, et pour les autres verbes <b>würde + infinitif</b>.</p>
+<table><tr><th></th><th>sein</th><th>haben</th><th>werden</th></tr>
+<tr><td>ich</td><td>wäre</td><td>hätte</td><td>würde</td></tr>
+<tr><td>du</td><td>wär(e)st</td><td>hättest</td><td>würdest</td></tr>
+<tr><td>er / sie</td><td>wäre</td><td>hätte</td><td>würde</td></tr>
+<tr><td>wir / sie</td><td>wären</td><td>hätten</td><td>würden</td></tr></table>
+<p><b>Condition irréelle</b> : <i>Wenn ich mehr Zeit <b>hätte</b>, <b>würde</b> ich mehr Sport <b>machen</b>.</i></p>
+<p><b>Souhait</b> : <i>Wenn ich doch nur Urlaub <b>hätte</b>!</i> · <i>Ich <b>wäre</b> gern am Meer.</i></p>
+<p>Quelques verbes fréquents ont leur propre forme : käme (kommen), ginge (gehen), wüsste (wissen), bräuchte (brauchen).</p>`,
+  ex: [
+    {q: "Wenn ich reich ___, würde ich um die Welt reisen.", a: ["wäre"], c: ["wäre", "hätte", "würde"], fr: "Si j'étais riche, je voyagerais autour du monde.", why: "sein → wäre."},
+    {q: "Wenn ich Zeit ___, würde ich mitkommen.", a: ["hätte"], c: ["wäre", "hätte", "habe"], fr: "Si j'avais le temps, je viendrais.", why: "haben → hätte."},
+    {q: "Was ___ du an meiner Stelle machen?", a: ["würdest"], c: ["würde", "würdest", "wirst"], fr: "Que ferais-tu à ma place ?", why: "du → würdest."},
+    {q: "Wenn es nicht regnen ___, würden wir spazieren gehen.", a: ["würde"], c: ["würde", "wird", "wäre"], fr: "S'il ne pleuvait pas, nous irions nous promener.", why: "würde + infinitif."},
+    {q: "Ich ___ gern länger schlafen. (pouvoir)", a: ["könnte"], fr: "J'aimerais pouvoir dormir plus longtemps.", why: "können → könnte."},
+    {q: "Wenn ich das ___, würde ich es dir sagen. (wissen)", a: ["wüsste"], fr: "Si je le savais, je te le dirais.", why: "wissen → wüsste."},
+    {q: "Du ___ mehr Wasser trinken. (conseil)", a: ["solltest"], c: ["solltest", "sollst", "würdest"], fr: "Tu devrais boire plus d'eau.", why: "Conseil → solltest."}
+  ]
+},
+{
+  id: "b1-genitiv", level: "B1",
+  title: "Le génitif",
+  sub: "das Auto des Chefs, wegen des Wetters",
+  body: `
+<p>Le génitif exprime la <b>possession</b> (« de ») et suit certaines prépositions.</p>
+<table><tr><th></th><th>défini</th><th>indéfini</th></tr>
+<tr><td>masculin</td><td><b>des</b> Mann<b>es</b></td><td><b>eines</b> Mann<b>es</b></td></tr>
+<tr><td>féminin</td><td><b>der</b> Frau</td><td><b>einer</b> Frau</td></tr>
+<tr><td>neutre</td><td><b>des</b> Kind<b>es</b></td><td><b>eines</b> Kind<b>es</b></td></tr>
+<tr><td>pluriel</td><td><b>der</b> Kinder</td><td>–</td></tr></table>
+<p>Au masculin et au neutre, le nom prend <b>-s</b> ou <b>-es</b> (mots d'une syllabe : souvent -es : des Tages, des Buches).</p>
+<p>Noms propres : <b>Annas</b> Auto, <b>Pauls</b> Büro (sans apostrophe).</p>
+<p>Prépositions + génitif : <b>wegen</b> (à cause de), <b>während</b> (pendant), <b>trotz</b> (malgré), <b>statt</b> (au lieu de), <b>innerhalb / außerhalb</b>.</p>
+<p>À l'oral, on remplace souvent par <b>von</b> + datif : das Auto <b>von meinem</b> Bruder.</p>`,
+  ex: [
+    {q: "Das ist das Büro ___ Chefs.", a: ["des"], c: ["der", "des", "dem"], fr: "C'est le bureau du chef.", why: "der Chef → génitif des Chefs."},
+    {q: "Die Farbe ___ Wand gefällt mir nicht.", a: ["der"], c: ["der", "des", "die"], fr: "La couleur du mur ne me plaît pas.", why: "die Wand → génitif der."},
+    {q: "Wegen ___ Wetters bleiben wir zu Hause.", a: ["des"], c: ["des", "dem", "das"], fr: "À cause du temps, nous restons à la maison.", why: "wegen + génitif, das Wetter → des Wetters."},
+    {q: "Während ___ Meetings war mein Handy aus.", a: ["des"], c: ["des", "dem", "der"], fr: "Pendant la réunion, mon portable était éteint.", why: "während + génitif, das Meeting → des Meetings."},
+    {q: "Trotz ___ Regens gingen wir spazieren.", a: ["des"], c: ["des", "dem", "den"], fr: "Malgré la pluie, nous sommes allés nous promener.", why: "trotz + génitif, der Regen → des Regens."},
+    {q: "Das ist ___ Fahrrad. (le vélo d'Anna)", a: ["Annas"], fr: "C'est le vélo d'Anna.", why: "Nom propre + s, sans apostrophe."},
+    {q: "Die Wohnung meiner Eltern ist groß. → Die Wohnung ___ meinen Eltern…", a: ["von"], fr: "L'appartement de mes parents est grand.", why: "À l'oral : von + datif."}
+  ]
+},
+{
+  id: "b1-praepverben", level: "B1",
+  title: "Verbes à préposition et da- / wo-",
+  sub: "warten auf → darauf, worauf?",
+  body: `
+<p>Beaucoup de verbes ont une préposition fixe : <b>warten auf</b> + acc., <b>denken an</b> + acc., <b>sprechen über</b> + acc., <b>sich freuen auf / über</b>, <b>teilnehmen an</b> + dat., <b>bitten um</b>, <b>träumen von</b>, <b>Angst haben vor</b> + dat.</p>
+<p>Pour une <b>chose</b>, on remplace « préposition + pronom » par <b>da(r)- + préposition</b> ; pour une question, <b>wo(r)- + préposition</b>.</p>
+<table><tr><th>personne</th><th>chose</th><th>question (chose)</th></tr>
+<tr><td>auf ihn</td><td><b>darauf</b></td><td><b>worauf</b>?</td></tr>
+<tr><td>an sie</td><td><b>daran</b></td><td><b>woran</b>?</td></tr>
+<tr><td>über ihn</td><td><b>darüber</b></td><td><b>worüber</b>?</td></tr>
+<tr><td>mit ihr</td><td><b>damit</b></td><td><b>womit</b>?</td></tr></table>
+<p>Le <b>r</b> s'ajoute quand la préposition commence par une voyelle (dar-auf, wor-an). Pour une personne : <i>Auf <b>wen</b> wartest du?</i></p>`,
+  ex: [
+    {q: "Ich warte ___ den Bus.", a: ["auf"], c: ["auf", "für", "an"], fr: "J'attends le bus.", why: "warten auf + accusatif."},
+    {q: "Denkst du an den Termin? – Ja, ich denke ___.", a: ["daran"], c: ["daran", "an ihn", "woran"], fr: "Tu penses au rendez-vous ? – Oui, j'y pense.", why: "Chose → da + r + an."},
+    {q: "___ freust du dich? – Auf den Urlaub.", a: ["Worauf"], c: ["Worauf", "Auf was", "Darauf"], fr: "De quoi te réjouis-tu ? – Des vacances.", why: "Question sur une chose → worauf."},
+    {q: "Wir haben lange ___ gesprochen. (de cela)", a: ["darüber"], c: ["darüber", "davon", "worüber"], fr: "Nous en avons parlé longtemps.", why: "sprechen über → darüber."},
+    {q: "___ wartest du? – Auf meine Freundin.", a: ["Auf wen"], c: ["Worauf", "Auf wen", "Wem"], fr: "Qui attends-tu ? – Ma copine.", why: "Personne → préposition + wen."},
+    {q: "Ich nehme ___ Kurs teil.", a: ["am"], c: ["am", "an den", "im"], fr: "Je participe au cours.", why: "teilnehmen an + datif → am."},
+    {q: "Sie hat Angst ___ der Prüfung.", a: ["vor"], c: ["vor", "für", "von"], fr: "Elle a peur de l'examen.", why: "Angst haben vor + datif."}
+  ]
+},
+{
+  id: "b1-zu", level: "B1",
+  title: "L'infinitif avec zu",
+  sub: "Ich habe vor, … zu …, um … zu, ohne … zu",
+  body: `
+<p>Après beaucoup de verbes et d'expressions, l'infinitif est précédé de <b>zu</b> et va à la fin : <i>Ich habe keine Lust, heute <b>zu kochen</b>.</i></p>
+<p>Déclencheurs fréquents : vorhaben, versuchen, vergessen, anfangen, aufhören, beschließen, Lust haben, Zeit haben, es ist wichtig / schwer / schön…</p>
+<p>Verbe à particule : <b>zu</b> entre la particule et le verbe : an<b>zu</b>rufen, ein<b>zu</b>kaufen.</p>
+<p><b>Pas de zu</b> après les modaux, werden, et lassen, gehen, sehen, hören.</p>
+<table><tr><th>construction</th><th>sens</th><th>exemple</th></tr>
+<tr><td>um … zu</td><td>pour (but)</td><td>Ich lerne Deutsch, um in Berlin zu arbeiten.</td></tr>
+<tr><td>ohne … zu</td><td>sans</td><td>Er ging, ohne etwas zu sagen.</td></tr>
+<tr><td>(an)statt … zu</td><td>au lieu de</td><td>Statt zu arbeiten, schläft er.</td></tr></table>
+<p>Avec um…zu, le sujet doit être le même ; sinon on utilise <b>damit</b>.</p>`,
+  ex: [
+    {q: "Ich habe vor, nächstes Jahr in Wien ___. (arbeiten)", a: ["zu arbeiten"], fr: "J'ai l'intention de travailler à Vienne l'an prochain.", why: "vorhaben → zu + infinitif à la fin."},
+    {q: "Vergiss nicht, deine Mutter ___! (anrufen)", a: ["anzurufen"], fr: "N'oublie pas d'appeler ta mère !", why: "Verbe à particule : an-zu-rufen."},
+    {q: "Ich spare Geld, ___ ein Auto zu kaufen.", a: ["um"], c: ["um", "ohne", "damit"], fr: "J'économise pour acheter une voiture.", why: "But, même sujet → um … zu."},
+    {q: "Er ist gegangen, ___ tschüss zu sagen.", a: ["ohne"], c: ["um", "ohne", "statt"], fr: "Il est parti sans dire au revoir.", why: "sans → ohne … zu."},
+    {q: "Ich muss heute länger ___. (arbeiten)", a: ["arbeiten"], c: ["arbeiten", "zu arbeiten"], fr: "Je dois travailler plus tard aujourd'hui.", why: "Après un modal : pas de zu."},
+    {q: "Ich erkläre es dir, ___ du es verstehst.", a: ["damit"], c: ["um", "damit", "ohne"], fr: "Je te l'explique pour que tu le comprennes.", why: "Sujets différents → damit."},
+    {q: "Es ist wichtig, regelmäßig Sport ___. (machen)", a: ["zu machen"], fr: "C'est important de faire du sport régulièrement.", why: "es ist wichtig → zu + infinitif."}
+  ]
+},
+{
+  id: "b1-doppel", level: "B1",
+  title: "Les connecteurs doubles",
+  sub: "entweder… oder, je… desto…",
+  body: `
+<table><tr><th>connecteur</th><th>sens</th><th>exemple</th></tr>
+<tr><td>sowohl … als auch</td><td>aussi bien… que</td><td>Ich spreche sowohl Englisch als auch Deutsch.</td></tr>
+<tr><td>weder … noch</td><td>ni… ni</td><td>Er trinkt weder Kaffee noch Tee.</td></tr>
+<tr><td>entweder … oder</td><td>soit… soit</td><td>Entweder wir fahren heute oder morgen.</td></tr>
+<tr><td>nicht nur … sondern auch</td><td>non seulement… mais aussi</td><td>Sie ist nicht nur nett, sondern auch kompetent.</td></tr>
+<tr><td>zwar … aber</td><td>certes… mais</td><td>Die Wohnung ist zwar klein, aber schön.</td></tr>
+<tr><td>je … desto</td><td>plus… plus</td><td>Je mehr ich lerne, desto besser spreche ich.</td></tr></table>
+<p><b>je … desto</b> : <i>je</i> + comparatif … verbe à la fin, puis <i>desto</i> + comparatif + verbe + sujet.</p>`,
+  ex: [
+    {q: "Ich trinke ___ Alkohol noch Kaffee.", a: ["weder"], c: ["weder", "entweder", "sowohl"], fr: "Je ne bois ni alcool ni café.", why: "ni… ni → weder … noch."},
+    {q: "Wir können ___ ins Kino oder ins Theater gehen.", a: ["entweder"], c: ["weder", "entweder", "sowohl"], fr: "On peut aller soit au cinéma soit au théâtre.", why: "soit… soit → entweder … oder."},
+    {q: "Sie spricht sowohl Spanisch ___ Italienisch.", a: ["als auch"], c: ["als auch", "noch", "oder"], fr: "Elle parle aussi bien espagnol qu'italien.", why: "sowohl … als auch."},
+    {q: "Je früher wir anfangen, ___ früher sind wir fertig.", a: ["desto"], c: ["desto", "je", "so"], fr: "Plus tôt nous commençons, plus tôt nous avons fini.", why: "je … desto."},
+    {q: "Das Hotel ist ___ teuer, aber sehr schön.", a: ["zwar"], c: ["zwar", "nicht nur", "weder"], fr: "L'hôtel est certes cher, mais très beau.", why: "certes… mais → zwar … aber."},
+    {q: "Er ist nicht nur mein Kollege, ___ auch mein Freund.", a: ["sondern"], c: ["aber", "sondern", "oder"], fr: "Ce n'est pas seulement mon collègue, mais aussi mon ami.", why: "nicht nur … sondern auch."},
+    {q: "Je mehr ich übe, desto besser ___.", a: ["spreche ich"], c: ["ich spreche", "spreche ich"], fr: "Plus je m'entraîne, mieux je parle.", why: "Après desto + comparatif : verbe puis sujet."}
+  ]
+},
+{
+  id: "b1-alswenn", level: "B1",
+  title: "als, wenn ou wann ?",
+  sub: "Trois façons de dire « quand »",
+  body: `
+<ul>
+<li><b>als</b> : une seule fois dans le <b>passé</b>. <i><b>Als</b> ich in Berlin wohnte, …</i></li>
+<li><b>wenn</b> : au <b>présent / futur</b>, ou une action <b>répétée</b> dans le passé (chaque fois que). <i><b>Wenn</b> ich Zeit habe, … · Immer <b>wenn</b> ich ihn besuchte, …</i></li>
+<li><b>wann</b> : <b>question</b> (directe ou indirecte). <i><b>Wann</b> kommst du? · Ich weiß nicht, <b>wann</b> er kommt.</i></li></ul>
+<p>als et wenn envoient le verbe à la fin ; wann aussi dans une question indirecte.</p>
+<p>Rappel : <b>wenn</b> = aussi « si » (condition).</p>`,
+  ex: [
+    {q: "___ ich ein Kind war, wohnte ich in Lyon.", a: ["Als"], c: ["Als", "Wenn", "Wann"], fr: "Quand j'étais enfant, j'habitais à Lyon.", why: "Une période unique dans le passé → als."},
+    {q: "___ ich nach Hause komme, koche ich.", a: ["Wenn"], c: ["Als", "Wenn", "Wann"], fr: "Quand je rentre à la maison, je cuisine.", why: "Présent / habitude → wenn."},
+    {q: "Weißt du, ___ der Zug kommt?", a: ["wann"], c: ["als", "wenn", "wann"], fr: "Tu sais quand arrive le train ?", why: "Question indirecte → wann."},
+    {q: "Immer ___ ich sie besuchte, backte sie einen Kuchen.", a: ["wenn"], c: ["als", "wenn", "wann"], fr: "Chaque fois que je lui rendais visite, elle faisait un gâteau.", why: "Répétition dans le passé → wenn."},
+    {q: "___ ich gestern ankam, regnete es.", a: ["Als"], c: ["Als", "Wenn", "Wann"], fr: "Quand je suis arrivé hier, il pleuvait.", why: "Une fois dans le passé → als."},
+    {q: "___ fängt das Konzert an?", a: ["Wann"], c: ["Als", "Wenn", "Wann"], fr: "Quand commence le concert ?", why: "Question → wann."}
+  ]
+},
+{
+  id: "b1-indirekt", level: "B1",
+  title: "Les questions indirectes",
+  sub: "Können Sie mir sagen, wo …?",
+  body: `
+<p>Une question indirecte commence par le <b>mot interrogatif</b> (ou <b>ob</b> pour oui/non) et le verbe va <b>à la fin</b>.</p>
+<p><i>Wo ist der Bahnhof? → Können Sie mir sagen, wo der Bahnhof <b>ist</b>?</i></p>
+<p><i>Kommt er morgen? → Weißt du, <b>ob</b> er morgen <b>kommt</b>?</i></p>
+<p>C'est la façon la plus <b>polie</b> de demander une information : <i>Wissen Sie, … · Können Sie mir sagen, … · Ich möchte wissen, … · Ich frage mich, …</i></p>`,
+  ex: [
+    {q: "Können Sie mir sagen, wo der Bahnhof ___?", a: ["ist"], fr: "Pouvez-vous me dire où est la gare ?", why: "Verbe à la fin."},
+    {q: "Weißt du, ___ das Geschäft heute geöffnet ist?", a: ["ob"], c: ["ob", "wenn", "dass"], fr: "Tu sais si le magasin est ouvert aujourd'hui ?", why: "Question oui/non → ob."},
+    {q: "Ich möchte wissen, wie viel das ___.", a: ["kostet"], fr: "Je voudrais savoir combien ça coûte.", why: "Verbe à la fin."},
+    {q: "Wissen Sie, wann ___?", a: ["der Zug abfährt"], c: ["fährt der Zug ab", "der Zug abfährt"], fr: "Savez-vous quand le train part ?", why: "Verbe (particule collée) à la fin."},
+    {q: "Ich frage mich, ___ er so spät kommt.", a: ["warum"], c: ["warum", "ob", "dass"], fr: "Je me demande pourquoi il arrive si tard.", why: "Question en W → mot interrogatif."},
+    {q: "Kannst du mir sagen, wer das gemacht ___?", a: ["hat"], fr: "Tu peux me dire qui a fait ça ?", why: "Perfekt : auxiliaire tout à la fin."}
+  ]
+},
+{
+  id: "b1-lassen", level: "B1",
+  title: "Le verbe lassen",
+  sub: "faire faire, laisser",
+  body: `
+<p><b>lassen</b> fonctionne comme un modal : infinitif à la fin, sans zu.</p>
+<ul><li><b>faire faire</b> : <i>Ich <b>lasse</b> mein Auto <b>reparieren</b>.</i> (je fais réparer ma voiture)</li>
+<li><b>laisser, permettre</b> : <i><b>Lass</b> mich das <b>machen</b>!</i></li>
+<li><b>laisser quelque part</b> : <i>Ich habe den Schlüssel im Büro <b>gelassen</b>.</i></li></ul>
+<p>Présent : ich lasse, du <b>lässt</b>, er <b>lässt</b>, wir lassen. Prétérit : ließ.</p>
+<p>Perfekt avec un autre verbe : double infinitif. <i>Ich <b>habe</b> mir die Haare <b>schneiden lassen</b>.</i></p>
+<p><b>sich lassen</b> = pouvoir être fait : <i>Das Fenster <b>lässt sich</b> nicht <b>öffnen</b>.</i></p>`,
+  ex: [
+    {q: "Ich ___ mein Fahrrad reparieren.", a: ["lasse"], fr: "Je fais réparer mon vélo.", why: "ich lasse."},
+    {q: "Er ___ sich die Haare schneiden.", a: ["lässt"], fr: "Il se fait couper les cheveux.", why: "er lässt (avec Umlaut)."},
+    {q: "___ mich bitte in Ruhe!", a: ["Lass"], c: ["Lass", "Lässt", "Lasse"], fr: "Laisse-moi tranquille, s'il te plaît !", why: "Impératif du → lass."},
+    {q: "Ich habe mein Handy zu Hause ___.", a: ["gelassen"], fr: "J'ai laissé mon portable à la maison.", why: "Seul (sans autre verbe) → gelassen."},
+    {q: "Wir haben das Dach reparieren ___.", a: ["lassen"], c: ["lassen", "gelassen"], fr: "Nous avons fait réparer le toit.", why: "Avec un autre verbe → double infinitif."},
+    {q: "Das Problem lässt ___ leicht lösen.", a: ["sich"], c: ["sich", "es", "man"], fr: "Le problème se résout facilement.", why: "sich lassen + infinitif = peut être fait."}
+  ]
+},
+{
+  id: "b1-ndekl", level: "B1",
+  title: "Les noms masculins en -n",
+  sub: "der Kollege → den Kollegen",
+  body: `
+<p>Certains noms masculins prennent <b>-n / -en</b> à tous les cas sauf au nominatif singulier (N-Deklination).</p>
+<table><tr><th>cas</th><th>exemple</th></tr>
+<tr><td>nominatif</td><td>der Kollege</td></tr>
+<tr><td>accusatif</td><td>den Kollege<b>n</b></td></tr>
+<tr><td>datif</td><td>dem Kollege<b>n</b></td></tr>
+<tr><td>génitif</td><td>des Kollege<b>n</b></td></tr></table>
+<p>Qui est concerné ?</p>
+<ul><li>masculins en <b>-e</b> pour une personne ou un animal : der Kunde, der Junge, der Franzose, der Name*</li>
+<li>masculins en <b>-ent, -ant, -ist, -at, -oge</b> : der Student, der Praktikant, der Journalist, der Kandidat, der Psychologe</li>
+<li>quelques autres : der Mensch, der Herr (Herr<b>n</b>), der Nachbar, der Bauer</li></ul>
+<p>*der Name, der Gedanke : génitif des Namen<b>s</b>.</p>`,
+  ex: [
+    {q: "Ich habe gestern den neuen Kolleg___ getroffen.", a: ["en"], c: ["e", "en", "es"], fr: "J'ai rencontré hier le nouveau collègue.", why: "Accusatif → Kollegen."},
+    {q: "Wir schicken dem Kund___ ein Angebot.", a: ["en"], c: ["e", "en", "s"], fr: "Nous envoyons un devis au client.", why: "Datif → Kunden."},
+    {q: "Sehr geehrter Herr Müller → Ich schreibe Herr___ Müller.", a: ["n"], fr: "J'écris à Monsieur Müller.", why: "Datif → Herrn."},
+    {q: "Kennst du den Student___ aus Spanien?", a: ["en"], c: ["", "en", "es"], fr: "Tu connais l'étudiant espagnol ?", why: "-ent → Studenten à l'accusatif."},
+    {q: "Der Praktikant___ kommt aus Lyon.", a: [""], c: ["(rien)", "en"], fr: "Le stagiaire vient de Lyon.", why: "Nominatif singulier : pas de -en."},
+    {q: "Ich helfe meinem Nachbar___.", a: ["n"], fr: "J'aide mon voisin.", why: "der Nachbar → dem Nachbarn."}
+  ]
+}
+);
+
+// Leçons B2.
+GRAMMAR.push(
+{
+  id: "b2-passif-plus", level: "B2",
+  title: "Le passif à tous les temps",
+  sub: "avec modaux, au Perfekt, au Plusquamperfekt",
+  body: `
+<table><tr><th>temps</th><th>exemple</th></tr>
+<tr><td>présent</td><td>Der Bericht <b>wird</b> geschrieben.</td></tr>
+<tr><td>prétérit</td><td>Der Bericht <b>wurde</b> geschrieben.</td></tr>
+<tr><td>Perfekt</td><td>Der Bericht <b>ist</b> geschrieben <b>worden</b>.</td></tr>
+<tr><td>Plusquamperfekt</td><td>Der Bericht <b>war</b> geschrieben <b>worden</b>.</td></tr>
+<tr><td>futur</td><td>Der Bericht <b>wird</b> geschrieben <b>werden</b>.</td></tr>
+<tr><td>avec modal</td><td>Der Bericht <b>muss</b> geschrieben <b>werden</b>.</td></tr>
+<tr><td>modal au passé</td><td>Der Bericht <b>musste</b> geschrieben <b>werden</b>.</td></tr></table>
+<p>En subordonnée, le verbe conjugué va tout à la fin : <i>…, dass der Bericht geschrieben werden <b>muss</b>.</i></p>
+<p>Passif sans sujet (avec verbes sans COD) : <i>Hier <b>wird</b> nicht <b>geraucht</b>. · Dem Kunden <b>wurde</b> sofort <b>geholfen</b>.</i></p>`,
+  ex: [
+    {q: "Das Problem muss sofort gelöst ___.", a: ["werden"], c: ["werden", "worden", "wird"], fr: "Le problème doit être résolu immédiatement.", why: "Modal + participe + werden."},
+    {q: "Die Daten sind gestern gelöscht ___.", a: ["worden"], c: ["werden", "worden", "geworden"], fr: "Les données ont été effacées hier.", why: "Perfekt passif → worden."},
+    {q: "Als ich ankam, ___ das Meeting schon beendet worden.", a: ["war"], c: ["war", "ist", "wurde"], fr: "Quand je suis arrivé, la réunion avait déjà été terminée.", why: "Plusquamperfekt passif → war … worden."},
+    {q: "Dem Kunden ___ sofort geholfen.", a: ["wurde"], c: ["wurde", "wurden", "hat"], fr: "Le client a été aidé immédiatement.", why: "Sans sujet → verbe au singulier."},
+    {q: "Die Dokumente konnten nicht gefunden ___.", a: ["werden"], c: ["werden", "worden", "sein"], fr: "Les documents n'ont pas pu être trouvés.", why: "Modal au passé + participe + werden."},
+    {q: "Ich glaube, dass das Projekt verschoben werden ___.", a: ["muss"], fr: "Je crois que le projet doit être reporté.", why: "Subordonnée : modal tout à la fin."},
+    {q: "Die neue Software wird nächste Woche installiert ___.", a: ["werden"], c: ["werden", "worden", "sein"], fr: "Le nouveau logiciel sera installé la semaine prochaine.", why: "Futur passif → wird … werden."}
+  ]
+},
+{
+  id: "b2-zustand", level: "B2",
+  title: "Passif d'action ou d'état",
+  sub: "wird geöffnet / ist geöffnet",
+  body: `
+<p><b>Vorgangspassiv</b> (werden + participe) : l'action en train de se faire. <i>Die Tür <b>wird</b> geöffnet.</i> (on ouvre la porte)</p>
+<p><b>Zustandspassiv</b> (sein + participe) : le <b>résultat</b>, l'état. <i>Die Tür <b>ist</b> geöffnet.</i> (la porte est ouverte)</p>
+<table><tr><th>action</th><th>résultat</th></tr>
+<tr><td>Das Geschäft wird um 9 geöffnet.</td><td>Das Geschäft ist bis 20 Uhr geöffnet.</td></tr>
+<tr><td>Der Tisch wurde reserviert.</td><td>Der Tisch ist reserviert.</td></tr>
+<tr><td>Die Rechnung wird bezahlt.</td><td>Die Rechnung ist schon bezahlt.</td></tr></table>
+<p>Au passé, l'état : <i>Der Tisch <b>war</b> reserviert.</i></p>`,
+  ex: [
+    {q: "Keine Sorge, der Tisch ___ schon reserviert.", a: ["ist"], c: ["ist", "wird"], fr: "Pas d'inquiétude, la table est déjà réservée.", why: "Résultat → sein."},
+    {q: "Das Museum ___ um 10 Uhr geöffnet. (on l'ouvre)", a: ["wird"], c: ["ist", "wird"], fr: "Le musée ouvre à 10 heures.", why: "Action → werden."},
+    {q: "Die Bank ___ heute geschlossen.", a: ["ist"], c: ["ist", "wird"], fr: "La banque est fermée aujourd'hui.", why: "État → sein."},
+    {q: "Als wir kamen, ___ alles schon vorbereitet.", a: ["war"], c: ["war", "wurde"], fr: "Quand nous sommes arrivés, tout était déjà prêt.", why: "État au passé → war."},
+    {q: "Gerade ___ das Büro renoviert.", a: ["wird"], c: ["ist", "wird"], fr: "Le bureau est en cours de rénovation.", why: "Action en cours → werden."},
+    {q: "Die Rechnung ___ seit Montag bezahlt.", a: ["ist"], c: ["ist", "wird"], fr: "La facture est payée depuis lundi.", why: "État → sein."}
+  ]
+},
+{
+  id: "b2-konj1", level: "B2",
+  title: "Le discours indirect (Konjunktiv I)",
+  sub: "Er sagt, er sei krank",
+  body: `
+<p>Les journaux et la langue formelle rapportent les paroles de quelqu'un avec le <b>Konjunktiv I</b>.</p>
+<p>Formation : radical + <b>-e</b>. La forme la plus utilisée est la 3e personne : er hab<b>e</b>, er komm<b>e</b>, er könn<b>e</b>, er werd<b>e</b>.</p>
+<table><tr><th></th><th>sein</th><th>haben</th><th>können</th></tr>
+<tr><td>ich</td><td>sei</td><td>(hätte)</td><td>könne</td></tr>
+<tr><td>er / sie</td><td>sei</td><td>habe</td><td>könne</td></tr>
+<tr><td>wir / sie</td><td>seien</td><td>(hätten)</td><td>(könnten)</td></tr></table>
+<p>Quand le Konjunktiv I ressemble au présent normal, on prend le <b>Konjunktiv II</b> (sie haben → sie <b>hätten</b>).</p>
+<p><b>Passé</b> : habe / sei + participe. <i>Er sagte, er <b>habe</b> nichts <b>gewusst</b>.</i></p>
+<p><b>Futur</b> : werde + infinitif. <i>Sie sagte, sie <b>werde</b> morgen <b>kommen</b>.</i></p>`,
+  ex: [
+    {q: "Der Minister sagte, er ___ zufrieden. (sein)", a: ["sei"], c: ["sei", "ist", "wäre"], fr: "Le ministre a dit qu'il était satisfait.", why: "sein → er sei."},
+    {q: "Sie erklärte, sie ___ keine Zeit. (haben)", a: ["habe"], c: ["habe", "hat", "hätte"], fr: "Elle a expliqué qu'elle n'avait pas le temps.", why: "haben → sie habe."},
+    {q: "Er behauptet, er ___ das nicht gewusst.", a: ["habe"], c: ["habe", "sei", "hat"], fr: "Il prétend qu'il ne le savait pas.", why: "Passé : habe + participe."},
+    {q: "Die Zeugen sagten, sie ___ nichts gesehen.", a: ["hätten"], c: ["haben", "hätten", "habe"], fr: "Les témoins ont dit qu'ils n'avaient rien vu.", why: "sie haben = présent → on prend le Konj. II hätten."},
+    {q: "Der Chef meinte, das Projekt ___ bald fertig. (sein)", a: ["sei"], fr: "Le chef a dit que le projet serait bientôt fini.", why: "sein → sei."},
+    {q: "Sie sagte, sie ___ morgen anrufen.", a: ["werde"], c: ["werde", "wird", "würde"], fr: "Elle a dit qu'elle appellerait demain.", why: "Futur au discours indirect → werde."},
+    {q: "Laut Polizei ___ der Fahrer zu schnell gefahren.", a: ["sei"], c: ["sei", "habe", "ist"], fr: "Selon la police, le conducteur aurait roulé trop vite.", why: "fahren → sein : sei gefahren."}
+  ]
+},
+{
+  id: "b2-konj2-passe", level: "B2",
+  title: "Le conditionnel passé",
+  sub: "Wenn ich das gewusst hätte…",
+  body: `
+<p>Pour des regrets ou des hypothèses sur le <b>passé</b> : <b>hätte / wäre</b> + participe passé.</p>
+<p><i>Wenn ich das <b>gewusst hätte</b>, <b>wäre</b> ich früher <b>gekommen</b>.</i> (si j'avais su, je serais venu plus tôt)</p>
+<p>Même choix haben / sein qu'au Perfekt.</p>
+<p><b>Avec un modal</b> : double infinitif. <i>Du <b>hättest</b> mich <b>anrufen sollen</b>.</i> (tu aurais dû m'appeler) · <i>Ich <b>hätte</b> das <b>machen können</b>.</i></p>
+<p><b>Sans wenn</b> : le verbe commence la phrase. <i><b>Hätte</b> ich das gewusst, wäre ich gekommen.</i></p>
+<p>Souhait irréel : <i>Wenn ich doch nur mehr gelernt <b>hätte</b>!</i></p>`,
+  ex: [
+    {q: "Wenn ich das gewusst ___, hätte ich dir geholfen.", a: ["hätte"], c: ["hätte", "wäre", "würde"], fr: "Si j'avais su, je t'aurais aidé.", why: "wissen → haben : hätte gewusst."},
+    {q: "Wenn der Zug pünktlich gewesen wäre, ___ wir nicht zu spät gekommen.", a: ["wären"], c: ["hätten", "wären", "würden"], fr: "Si le train avait été à l'heure, nous ne serions pas arrivés en retard.", why: "kommen → sein : wären gekommen."},
+    {q: "Du hättest mich anrufen ___.", a: ["sollen"], c: ["sollen", "gesollt", "sollten"], fr: "Tu aurais dû m'appeler.", why: "Modal → double infinitif."},
+    {q: "___ ich mehr Zeit gehabt, hätte ich das Buch gelesen.", a: ["Hätte"], c: ["Hätte", "Wenn", "Wäre"], fr: "Si j'avais eu plus de temps, j'aurais lu le livre.", why: "Sans wenn → le verbe commence."},
+    {q: "Ich ___ gern mitgekommen, aber ich war krank.", a: ["wäre"], c: ["hätte", "wäre", "würde"], fr: "Je serais bien venu, mais j'étais malade.", why: "mitkommen → sein."},
+    {q: "Wir hätten früher losfahren ___. (devoir)", a: ["müssen"], fr: "Nous aurions dû partir plus tôt.", why: "Double infinitif : losfahren müssen."}
+  ]
+},
+{
+  id: "b2-partizip", level: "B2",
+  title: "Les participes comme adjectifs",
+  sub: "die lachende Frau, das gekaufte Auto",
+  body: `
+<p><b>Partizip I</b> (infinitif + <b>d</b>) : action <b>en cours</b>, sens actif. <i>das schlafen<b>d</b>e Kind</i> (l'enfant qui dort)</p>
+<p><b>Partizip II</b> (participe passé) : action <b>terminée</b> ou sens passif. <i>das reparier<b>t</b>e Auto</i> (la voiture réparée)</p>
+<p>Comme les adjectifs, ils prennent les terminaisons : <i>mit dem steigend<b>en</b> Umsatz, ein gut vorbereitet<b>er</b> Vortrag</i>.</p>
+<table><tr><th>relative</th><th>participe</th></tr>
+<tr><td>der Preis, der steigt</td><td>der steigende Preis</td></tr>
+<tr><td>die Wohnung, die renoviert wurde</td><td>die renovierte Wohnung</td></tr>
+<tr><td>die Gäste, die ankommen</td><td>die ankommenden Gäste</td></tr></table>`,
+  ex: [
+    {q: "Das ___ Kind darf man nicht wecken. (schlafen)", a: ["schlafende"], fr: "Il ne faut pas réveiller l'enfant qui dort.", why: "En cours → Partizip I : schlafend + e."},
+    {q: "Die ___ Wohnung ist sehr hell. (renovieren)", a: ["renovierte"], fr: "L'appartement rénové est très lumineux.", why: "Passif, terminé → Partizip II + e."},
+    {q: "Wegen der ___ Preise kaufen die Leute weniger. (steigen)", a: ["steigenden"], fr: "À cause des prix qui augmentent, les gens achètent moins.", why: "Partizip I, génitif pluriel → -en."},
+    {q: "Ich habe die ___ E-Mail noch nicht gelesen. (schicken)", a: ["geschickte"], fr: "Je n'ai pas encore lu l'e-mail envoyé.", why: "Partizip II, accusatif féminin → -e."},
+    {q: "Wir begrüßen die ___ Gäste. (ankommen)", a: ["ankommenden"], fr: "Nous accueillons les invités qui arrivent.", why: "Partizip I, pluriel → -en."},
+    {q: "Das ist ein gut ___ Plan. (durchdenken)", a: ["durchdachter"], fr: "C'est un plan bien réfléchi.", why: "durchdenken → durchdacht ; ein + masculin nominatif → -er."}
+  ]
+},
+{
+  id: "b2-praep-gen", level: "B2",
+  title: "Prépositions formelles + génitif",
+  sub: "aufgrund, innerhalb, bezüglich…",
+  body: `
+<p>Langue écrite et professionnelle :</p>
+<table><tr><th>préposition</th><th>sens</th><th>exemple</th></tr>
+<tr><td>aufgrund</td><td>en raison de</td><td>aufgrund des Streiks</td></tr>
+<tr><td>innerhalb / außerhalb</td><td>dans un délai de / en dehors de</td><td>innerhalb einer Woche</td></tr>
+<tr><td>während</td><td>pendant</td><td>während der Sitzung</td></tr>
+<tr><td>trotz</td><td>malgré</td><td>trotz des schlechten Wetters</td></tr>
+<tr><td>statt / anstelle</td><td>au lieu de</td><td>statt eines Briefes</td></tr>
+<tr><td>bezüglich</td><td>concernant</td><td>bezüglich Ihrer Anfrage</td></tr>
+<tr><td>infolge</td><td>à la suite de</td><td>infolge des Unfalls</td></tr>
+<tr><td>mithilfe</td><td>à l'aide de</td><td>mithilfe eines Programms</td></tr>
+<tr><td>laut</td><td>selon</td><td>laut des Berichts / laut Bericht</td></tr></table>
+<p>Adjectif après article au génitif → <b>-en</b> : <i>wegen des schlecht<b>en</b> Wetters</i>.</p>`,
+  ex: [
+    {q: "Aufgrund ___ Streiks fallen viele Züge aus.", a: ["des"], c: ["des", "dem", "den"], fr: "En raison de la grève, beaucoup de trains sont annulés.", why: "aufgrund + génitif, der Streik → des Streiks."},
+    {q: "Bitte antworten Sie innerhalb ___ Woche.", a: ["einer"], c: ["eine", "einer", "einem"], fr: "Veuillez répondre dans un délai d'une semaine.", why: "innerhalb + génitif, die Woche → einer."},
+    {q: "Bezüglich ___ Anfrage melde ich mich morgen.", a: ["Ihrer"], c: ["Ihre", "Ihrer", "Ihren"], fr: "Concernant votre demande, je reviens vers vous demain.", why: "bezüglich + génitif féminin → Ihrer."},
+    {q: "Trotz des schlecht___ Wetters fand das Fest statt.", a: ["en"], c: ["e", "en", "es"], fr: "Malgré le mauvais temps, la fête a eu lieu.", why: "Adjectif au génitif après des → -en."},
+    {q: "Statt ___ Anrufs schickte er eine E-Mail.", a: ["eines"], c: ["ein", "eines", "einem"], fr: "Au lieu d'appeler, il a envoyé un e-mail.", why: "statt + génitif, der Anruf → eines Anrufs."},
+    {q: "Infolge ___ Unfalls war die Straße gesperrt.", a: ["des"], c: ["des", "dem", "der"], fr: "À la suite de l'accident, la route était fermée.", why: "infolge + génitif."}
+  ]
+},
+{
+  id: "b2-konnektoren", level: "B2",
+  title: "Connecteurs avancés",
+  sub: "indem, sodass, falls, obwohl, sobald…",
+  body: `
+<p>Tous ces connecteurs envoient le verbe <b>à la fin</b> :</p>
+<table><tr><th>connecteur</th><th>sens</th><th>exemple</th></tr>
+<tr><td>indem</td><td>en (+ ant), moyen</td><td>Man lernt, indem man übt.</td></tr>
+<tr><td>sodass / so …, dass</td><td>si bien que</td><td>Es regnete, sodass wir zu Hause blieben.</td></tr>
+<tr><td>falls / sofern</td><td>au cas où / dans la mesure où</td><td>Falls du Fragen hast, ruf an.</td></tr>
+<tr><td>sobald</td><td>dès que</td><td>Sobald ich fertig bin, komme ich.</td></tr>
+<tr><td>solange</td><td>tant que</td><td>Solange es regnet, bleiben wir drin.</td></tr>
+<tr><td>seitdem</td><td>depuis que</td><td>Seitdem er hier wohnt, …</td></tr>
+<tr><td>bis</td><td>jusqu'à ce que</td><td>Warte, bis ich komme.</td></tr>
+<tr><td>während</td><td>tandis que (opposition)</td><td>Er arbeitet viel, während sie …</td></tr>
+<tr><td>anstatt dass / ohne dass</td><td>au lieu que / sans que</td><td>Er ging, ohne dass ich es merkte.</td></tr></table>`,
+  ex: [
+    {q: "Man verbessert sein Deutsch, ___ man viel spricht.", a: ["indem"], c: ["indem", "sodass", "falls"], fr: "On améliore son allemand en parlant beaucoup.", why: "Moyen → indem."},
+    {q: "___ du Hilfe brauchst, ruf mich an.", a: ["Falls"], c: ["Falls", "Indem", "Seitdem"], fr: "Au cas où tu aurais besoin d'aide, appelle-moi.", why: "Condition éventuelle → falls."},
+    {q: "Der Zug hatte Verspätung, ___ ich das Meeting verpasst habe.", a: ["sodass"], c: ["sodass", "indem", "solange"], fr: "Le train avait du retard, si bien que j'ai raté la réunion.", why: "Conséquence → sodass."},
+    {q: "Ich rufe dich an, ___ ich angekommen bin.", a: ["sobald"], c: ["sobald", "solange", "bis"], fr: "Je t'appelle dès que je suis arrivé.", why: "dès que → sobald."},
+    {q: "___ er in Berlin wohnt, spricht er besser Deutsch.", a: ["Seitdem"], c: ["Seitdem", "Sobald", "Falls"], fr: "Depuis qu'il habite à Berlin, il parle mieux allemand.", why: "depuis que → seitdem."},
+    {q: "Warte hier, ___ ich zurückkomme.", a: ["bis"], c: ["bis", "solange", "sobald"], fr: "Attends ici jusqu'à ce que je revienne.", why: "jusqu'à ce que → bis."},
+    {q: "Sie hat das Büro verlassen, ohne dass es jemand ___.", a: ["bemerkt hat"], c: ["hat bemerkt", "bemerkt hat"], fr: "Elle a quitté le bureau sans que personne ne le remarque.", why: "Verbe conjugué à la fin."}
+  ]
+},
+{
+  id: "b2-relatives-plus", level: "B2",
+  title: "Relatives avec was, wo, wer",
+  sub: "alles, was… · die Stadt, wo… · Wer…, der…",
+  body: `
+<ul>
+<li><b>was</b> après <b>alles, nichts, etwas, vieles, das</b> et un superlatif neutre : <i>Das ist alles, <b>was</b> ich weiß. · Das Beste, <b>was</b> ich je gegessen habe.</i></li>
+<li><b>was</b> pour reprendre toute une phrase : <i>Er kam zu spät, <b>was</b> mich ärgerte.</i></li>
+<li><b>wo</b> pour un lieu (oral) : <i>die Stadt, <b>wo</b> ich wohne</i> (= in der ich wohne).</li>
+<li><b>wer …, (der)</b> : celui qui (général). <i><b>Wer</b> viel arbeitet, <b>(der)</b> braucht Pausen.</i></li>
+<li><b>wo(r)- + préposition</b> pour une chose vague : <i>Das ist etwas, <b>worüber</b> ich nicht sprechen möchte.</i></li></ul>`,
+  ex: [
+    {q: "Das ist alles, ___ ich weiß.", a: ["was"], c: ["was", "das", "die"], fr: "C'est tout ce que je sais.", why: "Après alles → was."},
+    {q: "Er hat die Prüfung bestanden, ___ mich sehr freut.", a: ["was"], c: ["was", "das", "der"], fr: "Il a réussi l'examen, ce qui me fait très plaisir.", why: "Reprend toute la phrase → was."},
+    {q: "Das ist das Café, ___ wir uns kennengelernt haben.", a: ["wo"], c: ["wo", "was", "wohin"], fr: "C'est le café où nous nous sommes rencontrés.", why: "Lieu → wo."},
+    {q: "___ zu spät kommt, muss draußen warten.", a: ["Wer"], c: ["Wer", "Der", "Was"], fr: "Celui qui arrive en retard doit attendre dehors.", why: "Celui qui (général) → wer."},
+    {q: "Das ist das Schönste, ___ ich je gesehen habe.", a: ["was"], c: ["was", "das", "wo"], fr: "C'est la plus belle chose que j'aie jamais vue.", why: "Superlatif neutre → was."},
+    {q: "Es gibt etwas, ___ ich mit dir sprechen muss.", a: ["worüber"], c: ["worüber", "darüber", "was"], fr: "Il y a quelque chose dont je dois parler avec toi.", why: "sprechen über + chose vague → worüber."}
+  ]
+},
+{
+  id: "b2-nominal", level: "B2",
+  title: "Nominaliser",
+  sub: "weil es regnet → wegen des Regens",
+  body: `
+<p>À l'écrit professionnel, on transforme souvent une subordonnée en <b>groupe nominal</b>.</p>
+<table><tr><th>verbal</th><th>nominal</th></tr>
+<tr><td>weil es regnet</td><td>wegen des Regens</td></tr>
+<tr><td>obwohl er krank war</td><td>trotz seiner Krankheit</td></tr>
+<tr><td>wenn man bestellt</td><td>bei einer Bestellung</td></tr>
+<tr><td>nachdem er angekommen war</td><td>nach seiner Ankunft</td></tr>
+<tr><td>bevor das Meeting beginnt</td><td>vor Beginn des Meetings</td></tr>
+<tr><td>während sie studierte</td><td>während ihres Studiums</td></tr>
+<tr><td>um Kosten zu sparen</td><td>zur Einsparung von Kosten</td></tr></table>
+<p>Formation des noms : infinitif neutre (<b>das</b> Lesen), -ung (<b>die</b> Lösung), radical (<b>der</b> Beginn, <b>der</b> Anruf).</p>`,
+  ex: [
+    {q: "Weil es stark regnete → ___ des starken Regens", a: ["Wegen"], c: ["Wegen", "Trotz", "Bei"], fr: "À cause de la forte pluie", why: "weil → wegen."},
+    {q: "Obwohl sie krank war → ___ ihrer Krankheit", a: ["Trotz"], c: ["Wegen", "Trotz", "Nach"], fr: "Malgré sa maladie", why: "obwohl → trotz."},
+    {q: "Nachdem er angekommen war → nach seiner ___", a: ["Ankunft"], fr: "Après son arrivée", why: "ankommen → die Ankunft."},
+    {q: "Wenn man Fragen hat → ___ Fragen", a: ["Bei"], c: ["Bei", "Mit", "Vor"], fr: "En cas de questions", why: "wenn → bei."},
+    {q: "Bevor die Sitzung beginnt → vor ___ der Sitzung", a: ["Beginn"], fr: "Avant le début de la séance", why: "beginnen → der Beginn."},
+    {q: "Um das Problem zu lösen → zur ___ des Problems", a: ["Lösung"], fr: "Pour résoudre le problème", why: "lösen → die Lösung ; zu + der = zur."}
+  ]
+},
+{
+  id: "b2-futur2", level: "B2",
+  title: "Le futur antérieur et la supposition",
+  sub: "Er wird es vergessen haben",
+  body: `
+<p><b>Futur II</b> : werden + participe passé + <b>haben / sein</b>.</p>
+<ul><li>Action terminée dans le futur : <i>Bis Freitag <b>werde</b> ich den Bericht <b>geschrieben haben</b>.</i></li>
+<li>Surtout : <b>supposition sur le passé</b> (avec wohl, sicher, bestimmt) : <i>Er ist nicht da. Er <b>wird</b> den Termin wohl <b>vergessen haben</b>.</i> (il a dû oublier)</li></ul>
+<p><b>Futur I + wohl</b> = supposition sur le présent : <i>Sie <b>wird</b> wohl im Stau <b>stehen</b>.</i></p>`,
+  ex: [
+    {q: "Bis Montag werde ich das Projekt beendet ___.", a: ["haben"], c: ["haben", "sein", "werden"], fr: "D'ici lundi, j'aurai terminé le projet.", why: "beenden → haben."},
+    {q: "Er ist noch nicht da. Er wird den Zug verpasst ___.", a: ["haben"], c: ["haben", "sein"], fr: "Il n'est pas encore là. Il a dû rater le train.", why: "Supposition sur le passé → Futur II."},
+    {q: "Sie werden schon nach Hause gegangen ___.", a: ["sein"], c: ["haben", "sein"], fr: "Ils doivent déjà être rentrés à la maison.", why: "gehen → sein."},
+    {q: "Wo ist Anna? – Sie ___ wohl noch im Meeting sein.", a: ["wird"], c: ["wird", "ist", "hat"], fr: "Où est Anna ? – Elle doit être encore en réunion.", why: "Supposition sur le présent → wird … sein."},
+    {q: "In zwei Jahren ___ ich mein Studium abgeschlossen haben.", a: ["werde"], c: ["werde", "habe", "würde"], fr: "Dans deux ans, j'aurai terminé mes études.", why: "Futur II → werde … haben."}
+  ]
+}
+);
+
+// Leçons C1.
+GRAMMAR.push(
+{
+  id: "c1-modal-subj", level: "C1",
+  title: "Les modaux pour exprimer une supposition",
+  sub: "Er muss krank sein. Sie soll reich sein.",
+  body: `
+<p>Les modaux peuvent exprimer le <b>degré de certitude</b> du locuteur :</p>
+<table><tr><th>modal</th><th>certitude</th><th>exemple</th></tr>
+<tr><td>muss</td><td>presque sûr (doit)</td><td>Er <b>muss</b> krank sein.</td></tr>
+<tr><td>dürfte</td><td>probable</td><td>Das <b>dürfte</b> etwa 50 Euro kosten.</td></tr>
+<tr><td>kann / könnte</td><td>possible</td><td>Sie <b>könnte</b> im Stau stehen.</td></tr>
+<tr><td>kann nicht</td><td>impossible</td><td>Das <b>kann</b> nicht stimmen.</td></tr>
+<tr><td>soll</td><td>on dit que (ouï-dire)</td><td>Er <b>soll</b> sehr reich sein.</td></tr>
+<tr><td>will</td><td>il prétend que (lui-même)</td><td>Er <b>will</b> das nicht gewusst haben.</td></tr></table>
+<p><b>Sur le passé</b> : modal + participe + <b>haben / sein</b> (infinitif passé). <i>Er <b>muss</b> den Zug <b>verpasst haben</b>.</i> · <i>Sie <b>soll</b> früher in Paris <b>gewohnt haben</b>.</i></p>`,
+  ex: [
+    {q: "Das Licht ist an. Er ___ zu Hause sein. (presque sûr)", a: ["muss"], c: ["muss", "soll", "will"], fr: "La lumière est allumée. Il doit être à la maison.", why: "Déduction quasi certaine → muss."},
+    {q: "Der neue Chef ___ sehr streng sein. (on dit)", a: ["soll"], c: ["muss", "soll", "will"], fr: "Le nouveau chef serait très strict.", why: "Ouï-dire → soll."},
+    {q: "Er ___ den Unfall nicht gesehen haben. (il le prétend)", a: ["will"], c: ["muss", "soll", "will"], fr: "Il prétend ne pas avoir vu l'accident.", why: "Affirmation du sujet lui-même → will."},
+    {q: "Das ___ nicht stimmen, ich war doch dabei!", a: ["kann"], c: ["kann", "muss", "soll"], fr: "Ça ne peut pas être vrai, j'étais là !", why: "Impossibilité → kann nicht."},
+    {q: "Die Reparatur ___ etwa 200 Euro kosten. (probable)", a: ["dürfte"], c: ["dürfte", "will", "muss"], fr: "La réparation devrait coûter environ 200 euros.", why: "Probabilité → dürfte."},
+    {q: "Sie ist nicht da. Sie muss den Termin vergessen ___.", a: ["haben"], c: ["haben", "sein", "werden"], fr: "Elle n'est pas là. Elle a dû oublier le rendez-vous.", why: "Passé : participe + haben."},
+    {q: "Er soll gestern nach Paris geflogen ___.", a: ["sein"], c: ["haben", "sein"], fr: "Il serait parti hier en avion pour Paris.", why: "fliegen → sein."}
+  ]
+},
+{
+  id: "c1-passiversatz", level: "C1",
+  title: "Les alternatives au passif",
+  sub: "ist zu machen, lässt sich machen, -bar",
+  body: `
+<p>Pour exprimer une <b>possibilité</b> ou une <b>nécessité</b> passive sans werden :</p>
+<table><tr><th>forme</th><th>sens</th><th>exemple</th></tr>
+<tr><td>sein + zu + infinitif</td><td>doit / peut être fait</td><td>Die Rechnung <b>ist</b> bis Freitag <b>zu bezahlen</b>.</td></tr>
+<tr><td>sich lassen + infinitif</td><td>peut être fait</td><td>Das Problem <b>lässt sich</b> leicht <b>lösen</b>.</td></tr>
+<tr><td>adjectif en -bar / -lich</td><td>qu'on peut</td><td>Das ist <b>machbar</b>. Das ist <b>unverständlich</b>.</td></tr>
+<tr><td>man + actif</td><td>on</td><td><b>Man</b> muss das prüfen.</td></tr>
+<tr><td>bekommen + participe</td><td>passif du datif</td><td>Ich <b>bekomme</b> das Paket <b>geschickt</b>.</td></tr></table>
+<p>Au sens de « doit » ou « peut », <b>sein + zu</b> dépend du contexte : <i>Das Formular ist auszufüllen</i> (doit) · <i>Das ist nicht zu ändern</i> (ne peut pas).</p>`,
+  ex: [
+    {q: "Die Rechnung ist innerhalb von 14 Tagen ___ bezahlen.", a: ["zu"], fr: "La facture doit être payée sous 14 jours.", why: "sein + zu + infinitif."},
+    {q: "Das Fenster ___ sich nicht öffnen.", a: ["lässt"], c: ["lässt", "ist", "wird"], fr: "La fenêtre ne s'ouvre pas.", why: "sich lassen + infinitif."},
+    {q: "Diese Aufgabe ist in einer Woche mach___.", a: ["bar"], c: ["bar", "lich", "sam"], fr: "Cette tâche est faisable en une semaine.", why: "machen → machbar."},
+    {q: "Der Fehler kann nicht repariert werden. → Der Fehler ist nicht ___.", a: ["zu reparieren"], fr: "L'erreur ne peut pas être réparée.", why: "nicht + zu + infinitif = ne peut pas être…"},
+    {q: "Das Formular ist vollständig ___. (ausfüllen)", a: ["auszufüllen"], fr: "Le formulaire doit être rempli entièrement.", why: "Verbe à particule : aus-zu-füllen."},
+    {q: "Seine Schrift ist kaum les___.", a: ["bar"], c: ["bar", "lich"], fr: "Son écriture est à peine lisible.", why: "lesen → lesbar."}
+  ]
+},
+{
+  id: "c1-partizip-erw", level: "C1",
+  title: "Les groupes participiaux longs",
+  sub: "die von uns entwickelte Lösung",
+  body: `
+<p>À l'écrit, on place devant le nom un participe <b>accompagné de ses compléments</b>. Cela remplace une relative.</p>
+<table><tr><th>relative</th><th>groupe participial</th></tr>
+<tr><td>die Lösung, die von uns entwickelt wurde</td><td>die <b>von uns entwickelte</b> Lösung</td></tr>
+<tr><td>der Zug, der um 8 Uhr abfährt</td><td>der <b>um 8 Uhr abfahrende</b> Zug</td></tr>
+<tr><td>die Kosten, die ständig steigen</td><td>die <b>ständig steigenden</b> Kosten</td></tr>
+<tr><td>das Problem, das gelöst werden muss</td><td>das <b>zu lösende</b> Problem</td></tr></table>
+<p>Lecture : article → saute au nom → reviens au participe et à ses compléments.</p>
+<p><b>zu + Partizip I</b> (das zu lösende Problem) = qui doit être…</p>`,
+  ex: [
+    {q: "die Firma, die 1990 gegründet wurde → die 1990 ___ Firma", a: ["gegründete"], fr: "l'entreprise fondée en 1990", why: "Passif terminé → Partizip II + terminaison."},
+    {q: "der Kollege, der seit Jahren hier arbeitet → der seit Jahren hier ___ Kollege", a: ["arbeitende"], fr: "le collègue qui travaille ici depuis des années", why: "Actif en cours → Partizip I + e."},
+    {q: "die Aufgaben, die erledigt werden müssen → die zu ___ Aufgaben", a: ["erledigenden"], fr: "les tâches à accomplir", why: "zu + Partizip I + terminaison (pluriel → -en)."},
+    {q: "Wir sprechen über die von Ihnen vorgeschlagen___ Lösung.", a: ["e"], c: ["e", "en", "er"], fr: "Nous parlons de la solution que vous avez proposée.", why: "Accusatif féminin après die → -e."},
+    {q: "Wegen der ständig ___ Preise… (steigen)", a: ["steigenden"], fr: "À cause des prix qui augmentent sans cesse…", why: "Partizip I, génitif pluriel → -en."},
+    {q: "der im letzten Jahr ___ Bericht (veröffentlichen)", a: ["veröffentlichte"], fr: "le rapport publié l'année dernière", why: "veröffentlichen → veröffentlicht + e."}
+  ]
+},
+{
+  id: "c1-alsob", level: "C1",
+  title: "Comparaisons irréelles",
+  sub: "als ob, als wenn, als + verbe",
+  body: `
+<p>Pour dire « comme si » : <b>als ob / als wenn</b> + Konjunktiv II (verbe à la fin), ou <b>als</b> + verbe directement après.</p>
+<p><i>Er tut, <b>als ob</b> er nichts <b>wüsste</b>.</i> = <i>Er tut, <b>als wüsste</b> er nichts.</i></p>
+<p>Au passé : <i>Sie sieht aus, <b>als ob</b> sie nicht <b>geschlafen hätte</b>.</i></p>
+<p>Verbes typiques : so tun, aussehen, sich anhören, klingen, sich fühlen, wirken.</p>
+<p>À l'oral, on entend aussi le Konjunktiv I ou l'indicatif (als ob er krank ist), mais l'écrit soutenu préfère le Konjunktiv II.</p>`,
+  ex: [
+    {q: "Er tut so, als ob er alles ___. (wissen)", a: ["wüsste"], fr: "Il fait comme s'il savait tout.", why: "als ob + Konjunktiv II."},
+    {q: "Du siehst aus, als ___ du krank.", a: ["wärst"], c: ["wärst", "bist", "wäre"], fr: "Tu as l'air malade.", why: "als + verbe directement : als wärst du…"},
+    {q: "Es klingt, als ob es draußen ___. (regnen)", a: ["regnen würde", "regnete"], fr: "On dirait qu'il pleut dehors.", why: "als ob + würde + infinitif (ou regnete)."},
+    {q: "Sie wirkt, als ob sie nicht geschlafen ___.", a: ["hätte"], c: ["hätte", "wäre", "hat"], fr: "Elle a l'air de ne pas avoir dormi.", why: "Passé : hätte + participe."},
+    {q: "Er redet, als ___ er der Chef.", a: ["wäre"], c: ["wäre", "ist", "sei"], fr: "Il parle comme s'il était le chef.", why: "als + Konjunktiv II directement."}
+  ]
+},
+{
+  id: "c1-partikeln", level: "C1",
+  title: "Les particules de l'oral",
+  sub: "doch, ja, mal, eben, halt, eigentlich, wohl",
+  body: `
+<p>Ces petits mots ne se traduisent pas toujours, mais ils donnent le <b>ton</b> de la phrase.</p>
+<table><tr><th>particule</th><th>effet</th><th>exemple</th></tr>
+<tr><td>doch</td><td>insistance, reproche, « voyons »</td><td>Komm <b>doch</b> mit! · Das weißt du <b>doch</b>!</td></tr>
+<tr><td>ja</td><td>évidence partagée, surprise</td><td>Das ist <b>ja</b> toll!</td></tr>
+<tr><td>mal</td><td>adoucit une demande</td><td>Kannst du <b>mal</b> kommen?</td></tr>
+<tr><td>eben / halt</td><td>c'est comme ça (résignation)</td><td>Das ist <b>halt</b> so.</td></tr>
+<tr><td>eigentlich</td><td>au fait, en fait</td><td>Wie heißt du <b>eigentlich</b>?</td></tr>
+<tr><td>wohl</td><td>probablement</td><td>Er ist <b>wohl</b> krank.</td></tr>
+<tr><td>denn</td><td>question plus naturelle, curiosité</td><td>Was ist <b>denn</b> los?</td></tr>
+<tr><td>schon</td><td>rassurer</td><td>Das klappt <b>schon</b>.</td></tr></table>`,
+  ex: [
+    {q: "Komm ___ mit, das wird lustig!", a: ["doch"], c: ["doch", "denn", "eben"], fr: "Viens donc avec nous, ça va être sympa !", why: "Invitation insistante → doch."},
+    {q: "Was ist ___ los? Du siehst traurig aus.", a: ["denn"], c: ["denn", "halt", "mal"], fr: "Qu'est-ce qui se passe ? Tu as l'air triste.", why: "Question curieuse → denn."},
+    {q: "Kannst du ___ kurz das Fenster zumachen?", a: ["mal"], c: ["mal", "ja", "doch"], fr: "Tu peux fermer la fenêtre deux secondes ?", why: "Adoucir une demande → mal."},
+    {q: "Das ist ___ eine tolle Überraschung!", a: ["ja"], c: ["ja", "mal", "eben"], fr: "Mais quelle belle surprise !", why: "Surprise → ja."},
+    {q: "Ich verstehe es auch nicht, das ist ___ so.", a: ["halt"], c: ["halt", "denn", "mal"], fr: "Je ne comprends pas non plus, c'est comme ça.", why: "Résignation → halt / eben."},
+    {q: "Keine Sorge, das klappt ___!", a: ["schon"], c: ["schon", "denn", "mal"], fr: "Ne t'inquiète pas, ça va marcher !", why: "Rassurer → schon."},
+    {q: "Woher kommst du ___? (au fait)", a: ["eigentlich"], c: ["eigentlich", "halt", "ja"], fr: "Au fait, tu viens d'où ?", why: "au fait → eigentlich."}
+  ]
+},
+{
+  id: "c1-fvg", level: "C1",
+  title: "Expressions verbo-nominales",
+  sub: "zur Verfügung stellen, in Kraft treten…",
+  body: `
+<p>Dans la langue administrative et professionnelle, un verbe simple est souvent remplacé par <b>nom + verbe « vide »</b> (Funktionsverbgefüge).</p>
+<table><tr><th>expression</th><th>= verbe simple</th><th>sens</th></tr>
+<tr><td>zur Verfügung stellen</td><td>bereitstellen</td><td>mettre à disposition</td></tr>
+<tr><td>in Frage stellen</td><td>bezweifeln</td><td>remettre en question</td></tr>
+<tr><td>eine Entscheidung treffen</td><td>entscheiden</td><td>prendre une décision</td></tr>
+<tr><td>in Kraft treten</td><td>gültig werden</td><td>entrer en vigueur</td></tr>
+<tr><td>zum Ausdruck bringen</td><td>ausdrücken</td><td>exprimer</td></tr>
+<tr><td>Kritik üben an</td><td>kritisieren</td><td>critiquer</td></tr>
+<tr><td>in Betracht ziehen</td><td>berücksichtigen</td><td>envisager</td></tr>
+<tr><td>Bescheid geben / sagen</td><td>informieren</td><td>prévenir</td></tr>
+<tr><td>eine Rolle spielen</td><td>wichtig sein</td><td>jouer un rôle</td></tr>
+<tr><td>zur Sprache bringen</td><td>ansprechen</td><td>aborder (un sujet)</td></tr></table>`,
+  ex: [
+    {q: "Wir müssen bis morgen eine Entscheidung ___.", a: ["treffen"], c: ["treffen", "machen", "nehmen"], fr: "Nous devons prendre une décision d'ici demain.", why: "eine Entscheidung treffen."},
+    {q: "Das neue Gesetz tritt im Januar in ___.", a: ["Kraft"], fr: "La nouvelle loi entre en vigueur en janvier.", why: "in Kraft treten."},
+    {q: "Die Firma stellt uns einen Laptop zur ___.", a: ["Verfügung"], fr: "L'entreprise nous met un ordinateur à disposition.", why: "zur Verfügung stellen."},
+    {q: "Können Sie mir bis Freitag Bescheid ___?", a: ["geben", "sagen"], c: ["geben", "machen", "stellen"], fr: "Pouvez-vous me prévenir d'ici vendredi ?", why: "Bescheid geben / sagen."},
+    {q: "Der Preis spielt für uns keine große ___.", a: ["Rolle"], fr: "Le prix ne joue pas un grand rôle pour nous.", why: "eine Rolle spielen."},
+    {q: "Diese Option sollten wir auch in Betracht ___.", a: ["ziehen"], c: ["ziehen", "stellen", "nehmen"], fr: "Nous devrions aussi envisager cette option.", why: "in Betracht ziehen."},
+    {q: "Ich möchte heute ein Problem zur Sprache ___.", a: ["bringen"], c: ["bringen", "stellen", "geben"], fr: "Je voudrais aborder un problème aujourd'hui.", why: "zur Sprache bringen."}
+  ]
+},
+{
+  id: "c1-konzessiv", level: "C1",
+  title: "Nuancer une opposition",
+  sub: "wenngleich, zwar… dennoch, so… auch, ungeachtet",
+  body: `
+<table><tr><th>forme</th><th>registre</th><th>exemple</th></tr>
+<tr><td>obwohl / obgleich / wenngleich</td><td>courant → soutenu</td><td>Wenngleich das Projekt teuer war, hat es sich gelohnt.</td></tr>
+<tr><td>zwar …, dennoch / jedoch</td><td>soutenu</td><td>Das Angebot ist zwar gut, dennoch lehnen wir ab.</td></tr>
+<tr><td>so + adj. + auch</td><td>si… que</td><td>So schwer es auch ist, wir schaffen es.</td></tr>
+<tr><td>wie … auch immer</td><td>quel que soit</td><td>Wie du dich auch entscheidest, ich unterstütze dich.</td></tr>
+<tr><td>selbst wenn / auch wenn</td><td>même si</td><td>Auch wenn es regnet, gehen wir.</td></tr>
+<tr><td>ungeachtet + gén.</td><td>très soutenu</td><td>Ungeachtet der Kritik hielt er an seinem Plan fest.</td></tr></table>
+<p>Après <b>so … auch</b> et <b>wie … auch</b>, la principale garde souvent l'ordre normal : <i>So teuer es auch ist, <b>ich kaufe</b> es.</i></p>`,
+  ex: [
+    {q: "___ das Wetter schlecht war, fand das Fest statt. (soutenu)", a: ["Wenngleich"], c: ["Wenngleich", "Zwar", "Dennoch"], fr: "Bien que le temps fût mauvais, la fête a eu lieu.", why: "Subordonnant soutenu → wenngleich."},
+    {q: "Das Angebot ist zwar attraktiv, ___ müssen wir ablehnen.", a: ["dennoch"], c: ["dennoch", "obwohl", "wenn"], fr: "L'offre est certes attrayante, nous devons pourtant refuser.", why: "zwar … dennoch (verbe en 2e position)."},
+    {q: "So schwierig es ___ ist, wir geben nicht auf.", a: ["auch"], fr: "Aussi difficile que ce soit, nous n'abandonnons pas.", why: "so … auch."},
+    {q: "___ wenn ich müde bin, gehe ich joggen.", a: ["Auch", "Selbst"], c: ["Auch", "So", "Wie"], fr: "Même si je suis fatigué, je vais courir.", why: "même si → auch / selbst wenn."},
+    {q: "___ der hohen Kosten wurde das Projekt fortgesetzt.", a: ["Ungeachtet"], c: ["Ungeachtet", "Obwohl", "Zwar"], fr: "Malgré les coûts élevés, le projet a été poursuivi.", why: "Préposition + génitif → ungeachtet."},
+    {q: "Wie du dich ___ immer entscheidest, ich helfe dir.", a: ["auch"], fr: "Quelle que soit ta décision, je t'aiderai.", why: "wie … auch immer."}
+  ]
+},
+{
+  id: "c1-inf-passe", level: "C1",
+  title: "Infinitif passé et passif",
+  sub: "gemacht haben, gemacht worden sein",
+  body: `
+<table><tr><th>forme</th><th>exemple</th></tr>
+<tr><td>infinitif présent actif</td><td>machen</td></tr>
+<tr><td>infinitif passé actif</td><td>gemacht <b>haben</b> / gegangen <b>sein</b></td></tr>
+<tr><td>infinitif présent passif</td><td>gemacht <b>werden</b></td></tr>
+<tr><td>infinitif passé passif</td><td>gemacht <b>worden sein</b></td></tr></table>
+<p>Utilisé avec <b>zu</b>, les modaux subjectifs et le futur :</p>
+<ul><li><i>Ich bin froh, die Prüfung <b>bestanden zu haben</b>.</i> (d'avoir réussi)</li>
+<li><i>Er bedauert, so früh <b>gegangen zu sein</b>.</i></li>
+<li><i>Das Bild soll im 16. Jahrhundert <b>gemalt worden sein</b>.</i></li>
+<li><i>Ich hoffe, <b>eingeladen zu werden</b>.</i> (d'être invité)</li></ul>`,
+  ex: [
+    {q: "Ich freue mich, Sie kennengelernt zu ___.", a: ["haben"], c: ["haben", "sein", "werden"], fr: "Je suis ravi de vous avoir rencontré.", why: "kennenlernen → haben."},
+    {q: "Er bedauert, nicht mitgekommen zu ___.", a: ["sein"], c: ["haben", "sein", "werden"], fr: "Il regrette de ne pas être venu.", why: "mitkommen → sein."},
+    {q: "Ich hoffe, zum Vorstellungsgespräch eingeladen zu ___.", a: ["werden"], c: ["haben", "sein", "werden"], fr: "J'espère être invité à l'entretien.", why: "Passif présent → werden."},
+    {q: "Die Kirche soll im Mittelalter gebaut worden ___.", a: ["sein"], c: ["haben", "sein", "werden"], fr: "L'église aurait été construite au Moyen Âge.", why: "Infinitif passé passif → worden sein."},
+    {q: "Sie behauptet, den Brief nie bekommen zu ___.", a: ["haben"], c: ["haben", "sein"], fr: "Elle affirme ne jamais avoir reçu la lettre.", why: "bekommen → haben."},
+    {q: "Er gibt zu, einen Fehler gemacht zu ___.", a: ["haben"], c: ["haben", "sein", "werden"], fr: "Il admet avoir fait une erreur.", why: "machen → haben : gemacht zu haben."}
+  ]
+}
+);
+
 S.gram=S.gram||{};
 let gL=null, gRun=null;
 function gNorm(s){return norm(String(s).replace(/…/g,""))}
@@ -937,15 +1855,21 @@ function blankQ(q,fill){return esc(q).replace("___",`<span class="blank">${fill?
 function renderGram(){
   const el=$("gramSection");
   if(!gL){
-    el.innerHTML=`<p class="gfr" style="margin:0">${GRAMMAR.length} leçons essentielles du niveau A2, chacune avec ses exercices.</p><ul class="lessons">`+GRAMMAR.map((l,i)=>{
+    const LV=["A1","A2","B1","B2","C1"], lv=LV.includes(S.glevel)?S.glevel:"A1";
+    const LVTXT={A1:"Débutant : les bases pour se présenter et parler du quotidien.",A2:"Élémentaire : raconter au passé, relier ses idées, être poli.",B1:"Intermédiaire : s'exprimer avec plus de nuances et de précision.",B2:"Avancé : textes plus complexes, langue écrite et professionnelle.",C1:"Autonome : nuances fines et style soutenu."};
+    const done=l=>S.gram[l.id]!=null;
+    el.innerHTML=`<div class="chips" id="gLv">${LV.map(x=>{const L=GRAMMAR.filter(l=>l.level===x);return `<button class="chip" data-l="${x}" aria-pressed="${x===lv}">${x}<small>${L.filter(done).length}/${L.length}</small></button>`}).join("")}</div>
+      <p class="gfr" style="margin:0">${LVTXT[lv]}</p><ul class="lessons">`+GRAMMAR.map((l,i)=>{
+      if(l.level!==lv) return "";
       const b=S.gram[l.id], full=b!=null&&b===l.ex.length;
       return `<li><button data-i="${i}"><span class="lt"><b>${esc(l.title)}</b><small>${esc(l.sub)}</small></span><span class="score${full?" full":""}">${b==null?"À faire":b+" / "+l.ex.length}</span></button></li>`}).join("")+"</ul>";
     el.querySelectorAll(".lessons button").forEach(b=>b.onclick=()=>{gL=GRAMMAR[+b.dataset.i];gRun=null;renderGram();window.scrollTo(0,0)});
+    el.querySelectorAll("#gLv .chip").forEach(b=>b.onclick=()=>{S.glevel=b.dataset.l;save();renderGram()});
     return;
   }
   if(!gRun){
-    el.innerHTML=`<button class="linkbtn" id="gBack" style="align-self:flex-start">← Toutes les leçons</button>
-      <article class="gpanel"><h2>${esc(gL.title)}</h2>${gL.body}</article>
+    el.innerHTML=`<button class="linkbtn" id="gBack" style="align-self:flex-start">← Leçons ${gL.level}</button>
+      <article class="gpanel"><span class="gfr">Niveau ${gL.level}</span><h2>${esc(gL.title)}</h2>${gL.body}</article>
       <button class="btn" id="gStart">Faire les exercices (${gL.ex.length})</button>`;
     el.querySelectorAll("table").forEach(tb=>{const w=document.createElement("div");w.className="tw";tb.replaceWith(w);w.appendChild(tb)});
     $("gBack").onclick=()=>{gL=null;renderGram()};
