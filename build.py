@@ -6,7 +6,7 @@ rows = []
 for f in sorted(glob.glob(str(root / "src/parts/*.tsv"))):
     rows += list(csv.reader(open(f, encoding="utf-8"), delimiter="\t", quoting=csv.QUOTE_NONE))
 cards = [[r[0], r[1], [t.strip() for t in r[2].split(",") if t.strip()], r[3], r[4], r[5], r[6]] for r in rows]
-html = (root / "src/app.html").read_text(encoding="utf-8").replace("__CARDS__", json.dumps(cards, ensure_ascii=False))
+html = (root / "src/app.html").read_text(encoding="utf-8").replace("__CARDS__", json.dumps(cards, ensure_ascii=False)).replace("__GRAMMAR__", (root / "src/grammaire.js").read_text(encoding="utf-8"))
 (root / "index.html").write_text(html, encoding="utf-8")
 with open(root / "cartes-allemand.csv", "w", encoding="utf-8", newline="") as f:
     w = csv.writer(f)

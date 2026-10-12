@@ -111,6 +111,37 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .mine li b{color:var(--accent);font-weight:600}
 .mine li em{color:var(--muted);font-style:normal;font-size:.8rem}
 .mine button{border:0;background:none;color:var(--again);font-size:.85rem;flex:none}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.tabs button{border:0;background:none;padding:10px;font-weight:600;font-size:.95rem}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.section{display:flex;flex-direction:column;gap:14px}
+.lessons{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lessons button{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.lessons .lt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lessons b{font-family:var(--display);font-size:1.02rem}
+.lessons small{color:var(--muted);font-size:.85rem}
+.score{flex:none;font-size:.8rem;font-variant-numeric:tabular-nums;border-radius:999px;padding:3px 9px;border:1px solid var(--line);color:var(--muted)}
+.score.full{border-color:var(--good);color:var(--good)}
+.gpanel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;line-height:1.5}
+.gpanel h2{font-family:var(--display);font-size:1.3rem;margin:0;text-wrap:balance}
+.gpanel p,.gpanel ul{margin:0}
+.gpanel ul{padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tw table{border-collapse:collapse;width:100%;font-size:.88rem}
+.tw th,.tw td{padding:6px 9px;border-top:1px solid var(--line);text-align:left;white-space:nowrap}
+.tw tr:first-child th{border-top:0;background:var(--bg);font-weight:600}
+.tw td:first-child{color:var(--muted)}
+.gq{font-family:var(--display);font-size:1.3rem;line-height:1.35;overflow-wrap:anywhere}
+.gq .blank{display:inline-block;min-width:3em;border-bottom:2px solid var(--accent);color:var(--accent)}
+.gfr{color:var(--muted);font-size:.92rem}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choices button{border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 14px;font-size:1rem}
+.choices button.ok{border-color:var(--good);background:var(--good);color:var(--accent-ink)}
+.choices button.ko{border-color:var(--again);background:var(--again);color:var(--accent-ink)}
+.gfb{border-radius:12px;padding:10px 12px;background:var(--bg);font-size:.93rem;display:flex;flex-direction:column;gap:4px}
+.gfb.ok strong{color:var(--good)} .gfb.ko strong{color:var(--again)} .gfb.near strong{color:var(--hard)}
+.gtop{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.88rem;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:no-preference){.ans{animation:in .18s ease-out}@keyframes in{from{opacity:.2;transform:translateY(4px)}}}
 </style>
 </head><body>
@@ -119,6 +150,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     <h1>Deutsch <span>Karten</span></h1>
     <div class="stats" id="stats"></div>
   </header>
+  <div class="tabs" role="group" aria-label="Section"><button id="tabCards" aria-pressed="true">Cartes</button><button id="tabGram" aria-pressed="false">Grammaire</button></div>
+  <div class="section" id="cardsSection">
   <div class="bar" id="bar" aria-hidden="true"></div>
   <div class="chips" id="chips" role="group" aria-label="Tags"></div>
   <div class="row">
@@ -199,6 +232,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   </section>
 
   <div class="foot"><button class="linkbtn" id="toggle">Mes cartes</button> · <span id="total"></span> · <button class="linkbtn" id="reset">Remettre à zéro</button><span id="confirm" hidden> Sûr ? <button class="linkbtn" id="yes">Oui, effacer la progression</button></span></div>
+  </div>
+  <div class="section" id="gramSection" hidden></div>
 </div>
 
 <script>
@@ -457,6 +492,84 @@ $("addForm").onsubmit=e=>{e.preventDefault();const n=addCards([{fr:$("inFr").val
 $("csv").onchange=e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const n=addCards(parseCSV(String(rd.result)));$("msg").textContent=n+" carte"+(n>1?"s":"")+" importée"+(n>1?"s":"")+".";e.target.value=""};rd.readAsText(file,"utf-8")};
 document.addEventListener("keydown",e=>{if(e.target.closest("input,form")||S.view!=="cards")return;if(e.key===" "){e.preventDefault();reveal()}else if(["1","2","3"].includes(e.key))grade(+e.key-1)});
 if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
-render();
+// ---- Grammaire ----
+__GRAMMAR__
+S.gram=S.gram||{};
+let gL=null, gRun=null;
+function gNorm(s){return norm(String(s).replace(/…/g,""))}
+function showSection(){
+  const g=S.section==="gram";
+  $("tabCards").setAttribute("aria-pressed",!g); $("tabGram").setAttribute("aria-pressed",g);
+  $("cardsSection").hidden=g; $("gramSection").hidden=!g; $("stats").hidden=g;
+  if(g) renderGram(); else render();
+}
+function blankQ(q,fill){return esc(q).replace("___",`<span class="blank">${fill?esc(fill):"&nbsp;"}</span>`)}
+function renderGram(){
+  const el=$("gramSection");
+  if(!gL){
+    el.innerHTML=`<p class="gfr" style="margin:0">${GRAMMAR.length} leçons essentielles du niveau A2, chacune avec ses exercices.</p><ul class="lessons">`+GRAMMAR.map((l,i)=>{
+      const b=S.gram[l.id], full=b!=null&&b===l.ex.length;
+      return `<li><button data-i="${i}"><span class="lt"><b>${esc(l.title)}</b><small>${esc(l.sub)}</small></span><span class="score${full?" full":""}">${b==null?"À faire":b+" / "+l.ex.length}</span></button></li>`}).join("")+"</ul>";
+    el.querySelectorAll(".lessons button").forEach(b=>b.onclick=()=>{gL=GRAMMAR[+b.dataset.i];gRun=null;renderGram();window.scrollTo(0,0)});
+    return;
+  }
+  if(!gRun){
+    el.innerHTML=`<button class="linkbtn" id="gBack" style="align-self:flex-start">← Toutes les leçons</button>
+      <article class="gpanel"><h2>${esc(gL.title)}</h2>${gL.body}</article>
+      <button class="btn" id="gStart">Faire les exercices (${gL.ex.length})</button>`;
+    el.querySelectorAll("table").forEach(tb=>{const w=document.createElement("div");w.className="tw";tb.replaceWith(w);w.appendChild(tb)});
+    $("gBack").onclick=()=>{gL=null;renderGram()};
+    $("gStart").onclick=()=>{gRun={list:shuffle(gL.ex.slice()),pos:0,score:0,done:false};renderGram();window.scrollTo(0,0)};
+    return;
+  }
+  if(gRun.pos>=gRun.list.length){
+    const n=gRun.list.length, best=Math.max(S.gram[gL.id]||0,gRun.score); S.gram[gL.id]=best; save();
+    el.innerHTML=`<article class="gpanel" style="text-align:center;align-items:center"><h2>${gRun.score} / ${n}</h2>
+      <p>${gRun.score===n?"Parfait, tout est juste !":gRun.score>=n*0.7?"Très bien, encore un petit effort.":"Relis la leçon puis réessaie."}</p>
+      <p class="gfr">Meilleur score : ${best} / ${n}</p></article>
+      <button class="btn" id="gAgain">Recommencer les exercices</button>
+      <button class="btn ghost" id="gLesson">Revoir la leçon</button>
+      <button class="linkbtn" id="gAll">Toutes les leçons</button>`;
+    $("gAgain").onclick=()=>{gRun={list:shuffle(gL.ex.slice()),pos:0,score:0,done:false};renderGram()};
+    $("gLesson").onclick=()=>{gRun=null;renderGram();window.scrollTo(0,0)};
+    $("gAll").onclick=()=>{gL=null;gRun=null;renderGram()};
+    return;
+  }
+  const e=gRun.list[gRun.pos];
+  el.innerHTML=`<div class="gtop"><button class="linkbtn" id="gQuit">← ${esc(gL.title)}</button><span id="gCount">${gRun.pos+1} / ${gRun.list.length} · ${gRun.score} juste${gRun.score>1?"s":""}</span></div>
+    <article class="gpanel"><div class="gq" lang="de" id="gQ">${blankQ(e.q)}</div><div class="gfr">${esc(e.fr)}</div>
+    ${e.c?`<div class="choices" id="gC">${e.c.map((c,i)=>`<button data-i="${i}" lang="de">${esc(c)}</button>`).join("")}</div>`
+      :`<form id="gF" class="write"><label class="field" for="gIn">Ta réponse<input id="gIn" lang="de" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></label><button class="btn" type="submit">Vérifier</button></form>`}
+    <div class="gfb" id="gFb" hidden></div></article>
+    <button class="btn" id="gNext" hidden>${gRun.pos+1<gRun.list.length?"Question suivante":"Voir mon score"}</button>`;
+  $("gQuit").onclick=()=>{gRun=null;renderGram()};
+  const answer=val=>{
+    const v=gNorm(val), A=e.a.map(gNorm);
+    const bare=s=>fold(s).replace(/ae/g,"a").replace(/oe/g,"o").replace(/ue/g,"u");
+    const res=A.includes(v)?"ok":(v&&(A.map(fold).includes(fold(v))||A.map(bare).includes(bare(v))))?"near":"ko";
+    if(res==="ok") gRun.score++;
+    $("gCount").textContent=(gRun.pos+1)+" / "+gRun.list.length+" · "+gRun.score+" juste"+(gRun.score>1?"s":"");
+    $("gQ").innerHTML=blankQ(e.q,e.a[0]);
+    const fb=$("gFb"); fb.hidden=false; fb.className="gfb "+res;
+    fb.innerHTML=`<strong>${res==="ok"?"Juste !":res==="near"?"Presque : attention aux ä, ö, ü, ß.":"Pas tout à fait."}</strong>${res!=="ok"?`<span>Réponse : <b lang="de">${esc(e.a[0])}</b></span>`:""}<span>${esc(e.why)}</span>`;
+    $("gNext").hidden=false; $("gNext").focus();
+    return res;
+  };
+  if(e.c){
+    $("gC").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      if(!$("gNext").hidden) return;
+      const r=answer(b.textContent); b.classList.add(r==="ok"?"ok":"ko");
+      if(r!=="ok") $("gC").querySelectorAll("button").forEach(x=>{if(e.a.map(gNorm).includes(gNorm(x.textContent)))x.classList.add("ok")});
+    });
+  } else {
+    setTimeout(()=>$("gIn")&&$("gIn").focus(),50);
+    $("gF").onsubmit=ev=>{ev.preventDefault();if(!$("gNext").hidden)return;const r=answer($("gIn").value);$("gIn").readOnly=true;$("gIn").classList.add(r==="ok"?"ok":"ko")};
+  }
+  $("gNext").onclick=()=>{gRun.pos++;renderGram();window.scrollTo(0,0)};
+}
+$("tabCards").onclick=()=>{S.section="cards";save();showSection()};
+$("tabGram").onclick=()=>{S.section="gram";save();showSection()};
+
+showSection();
 </script>
 </body></html>
