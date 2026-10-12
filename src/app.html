@@ -202,7 +202,7 @@ S.custom=(S.custom||[]).map(c=>c.tags?c:{fr:c.fr,de:c.de,tags:[c.theme||"Mes car
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
-let CARDS=BASE, cur=null, revealed=false, ahead=false, cram=null;
+let CARDS=BASE, last=null, keep=false, cur=null, revealed=false, ahead=false, cram=null;
 
 function prog(c){return S.p[c.id]||{lvl:0,due:0,seen:false}}
 function pool(){return CARDS.filter(c=>S.tag==="Tout"||c.tags.includes(S.tag))}
@@ -216,12 +216,17 @@ function gramHTML(c){
 function nextCard(){
   if(cram) return cram.queue[0]||null;
   const now=Date.now(), P=pool();
-  const due=P.filter(c=>prog(c).seen&&prog(c).due<=now).sort((a,b)=>prog(a).due-prog(b).due);
-  if(due.length) return due[0];
+  // Pick at random, but avoid showing the card just answered again right away.
+  const pick=list=>{const l=list.length>1?list.filter(c=>c!==last):list;return l[Math.floor(Math.random()*l.length)]};
+  const due=P.filter(c=>prog(c).seen&&prog(c).due<=now);
   const fresh=P.filter(c=>!prog(c).seen);
   const newToday=Object.values(S.p).filter(p=>p.first&&now-p.first<DAY).length;
-  if(fresh.length&&(newToday<20||ahead)) return fresh[0];
-  if(ahead){const f=P.filter(c=>prog(c).seen).sort((a,b)=>prog(a).due-prog(b).due);return f[0]||null}
+  const canNew=fresh.length&&(newToday<20||ahead);
+  // Mix in new cards between reviews instead of always doing all reviews first.
+  if(due.length&&canNew) return Math.random()<.7?pick(due):pick(fresh);
+  if(due.length) return pick(due);
+  if(canNew) return pick(fresh);
+  if(ahead){const f=P.filter(c=>prog(c).seen).sort((a,b)=>prog(a).due-prog(b).due).slice(0,30);return f.length?pick(f):null}
   return null;
 }
 function label(d){return d<=0?"tout à l'heure":d===1?"demain":"dans "+d+" j"}
@@ -246,7 +251,9 @@ function render(){
   renderCard();
 }
 function renderCard(){
-  cur=nextCard(); revealed=false;
+  // Keep the card on screen when only the view or direction changes.
+  if(!(keep&&cur&&!cram&&pool().includes(cur))) cur=nextCard();
+  keep=false; revealed=false;
   if(cram&&!cur){
     $("doneTitle").textContent="Révision terminée !"; $("doneTxt").textContent="Tu as parcouru les "+cram.total+" cartes de "+tagName()+".";
     cram=null;
@@ -300,7 +307,7 @@ function grade(g){
   if(g===0){p.lvl=0;p.due=now+60000}
   else if(g===1){p.lvl=Math.max(1,p.lvl);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
   else {p.lvl=Math.min(5,p.lvl+1);p.due=now+INTERVALS[p.lvl]*DAY-3600000}
-  S.p[cur.id]=p; save();
+  S.p[cur.id]=p; save(); last=cur;
   if(cram){const c=cram.queue.shift(); if(g===0) cram.queue.splice(Math.min(4,cram.queue.length),0,c); else cram.done++;}
   render();
 }
@@ -355,9 +362,9 @@ function parseCSV(text){
 
 rebuild();
 $("speak").innerHTML=SPEAKER;
-$("dirFr").onclick=()=>{S.dir="fr";save();render()};
-$("dirDe").onclick=()=>{S.dir="de";save();render()};
-$("viewCards").onclick=()=>{S.view="cards";save();render()};
+$("dirFr").onclick=()=>{S.dir="fr";save();keep=true;render()};
+$("dirDe").onclick=()=>{S.dir="de";save();keep=true;render()};
+$("viewCards").onclick=()=>{S.view="cards";save();keep=true;render()};
 $("viewList").onclick=()=>{S.view="list";save();render()};
 $("maskBtn").onclick=()=>{S.mask=!S.mask;save();render()};
 $("cramBtn").onclick=startCram; $("doneCram").onclick=startCram; $("listCram").onclick=startCram;
